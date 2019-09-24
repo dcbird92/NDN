@@ -91,7 +91,7 @@ fi
 
 sleep 1
 
-
+cd "$BASE_DIR"
 #compile example
 file="./$1"
 
