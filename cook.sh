@@ -1,13 +1,8 @@
 #!/bin/bash
 
-PWD="$(pwd)"
-cd ..
-cd ..
-BASE_DIR="$(pwd)"
-ARDUPI_DIR="$BASE_DIR/arduPi"
-ARDUPIAPI_DIR="$BASE_DIR/arduPi-api"
-EXAMPLES_DIR="$BASE_DIR/examples/LoRa"
-LIBRARY_DIR="$BASE_DIR/libraries/arduPiLoRa"
+ARDUPI_DIR="arduPi"
+ARDUPIAPI_DIR="arduPi-api"
+LIBRARY_DIR="libraries/arduPiLoRa"
 
 #compile arduPi
 cd "$ARDUPI_DIR"
@@ -97,7 +92,6 @@ sleep 1
 
 
 #compile example
-cd "$EXAMPLES_DIR"
 file="./$1"
 
 if [ "$1" != "-clean" ]; then
