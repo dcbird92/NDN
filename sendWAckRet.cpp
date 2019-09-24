@@ -73,14 +73,10 @@ void setup()
 void loop(void)
 {
     string m;
-    cin >> m;
-    char message [m.length()];
-    for (int i = 0; i < m.length(); i++)
-    {
-      message[i] = m[i];
-    }
+    getline(cin, m);
+    char *cstr = &m[0];
     // Send message1 and print the result
-    e = sx1272.sendPacketTimeoutACKRetries(8, message);
+    e = sx1272.sendPacketTimeoutACKRetries(8, cstr);
     printf("Packet sent, state %d\n",e);
     
 }
