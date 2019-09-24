@@ -1,6 +1,6 @@
 #!/bin/bash
 
-BASE_DIR = "$(pwd)"
+BASE_DIR="$(pwd)"
 ARDUPI_DIR="$BASE_DIR/arduPi"
 ARDUPIAPI_DIR="$BASE_DIR/arduPi-api"
 LIBRARY_DIR="$BASE_DIR/libraries/arduPiLoRa"
