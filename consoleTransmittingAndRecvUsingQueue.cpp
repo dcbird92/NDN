@@ -127,7 +127,7 @@ void *transmit_and_recieve(void *threadid)
           if (!sx1272.sendPacketTimeout(0, cstr)) {
               cout << 'Error sending packet' << endl;
           }
-          
+
           // Reset flag after sending if there is nothing else to send
           toSend = Q.empty() == false;
 
@@ -138,7 +138,6 @@ void *transmit_and_recieve(void *threadid)
       // Otherwise check and see if there is available data (only check for 10 ms)
       else {
           if (sx1272.availableData(10)) {
-
                 for (unsigned int i = 0; i < sx1272.packet_received.length; i++)
                 {
                     my_packet[i] = (char)sx1272.packet_received.data[i];
