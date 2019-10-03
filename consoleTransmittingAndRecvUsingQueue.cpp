@@ -102,6 +102,7 @@ void *get_data_from_console(void *threadid)
         if (!packet.empty()) {        
             Q.push(packet);
             cout << 'Pushed ' << packet << ' into queue.' << endl;
+            toSend = true;
         }
   
         // Get the mutex unlocked 
@@ -126,6 +127,9 @@ void *transmit_and_recieve(void *threadid)
           if (!sx1272.sendPacketTimeout(0, cstr)) {
               cout << 'Error sending packet' << endl;
           }
+          
+          // Reset flag after sending if there is nothing else to send
+          toSend = Q.empty() == false;
 
           // After sending, unlock the queue and enter recieve mode again
           sx1272.receive();
