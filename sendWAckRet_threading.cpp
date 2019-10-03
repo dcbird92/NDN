@@ -31,6 +31,8 @@ using namespace std;
 int e;
 string m;
 char my_packet[100];
+char *cstr;
+bool toSend;
 
 char message1 [] = "Packet 1, wanting to see if received packet is the same as sent packet";
 char message2 [] = "Packet 2, broadcast test";
@@ -73,12 +75,6 @@ void setup()
   delay(1000);
 }
 
-void loop(void)
-{
-
-    
-}
-
 void *transmit_func(void *threadid)
 {
   long tid;
@@ -87,12 +83,12 @@ void *transmit_func(void *threadid)
   while(1)
   {
     getline(cin, m);
-    char *cstr = &m[0];
-    // Send message1 and print the result
-    e = sx1272.sendPacketTimeoutACKRetries(8, cstr);
-    printf("%s", m);
-    printf("Packet sent, state %d\n",e);
-    m = "";
+    cstr = &m[0];
+    if( strlen(cstr) != 0)
+    {
+      printf("Message passed in and ready to transmit");
+      toSend = true;
+    }
   }
   pthread_exit(NULL);
 }
@@ -103,20 +99,34 @@ void *receive_func(void *threadid)
   tid = (long) threadid;
   cout << "Creating receive thread\n";
   while(1){
-  // Receive message
-  e = sx1272.receivePacketTimeoutACK(10000);
-  if ( e == 0 )
+  // Transmit message  
+  if (toSend == 1)
   {
-    printf("Receive packet with ACK and retries, state %d\n",e);
-
-    for (unsigned int i = 0; i < sx1272.packet_received.length; i++)
+    e = sx1272.sendPacketTimeoutACKRetries(0, cstr);
+    printf("Packet sent, state %d\n",e);
+    if(e == 0)
     {
-      my_packet[i] = (char)sx1272.packet_received.data[i];
-    }
-    printf("Message: %s\n", my_packet);
+      toSend = 0;
+      cstr = "";
+      }
   }
-  else {
-    printf("Receive packet with ACK and retries, state %d\n",e);
+  // Receive message
+  else
+  {
+    e = sx1272.receivePacketTimeoutACK(10000);
+    if ( e == 0 )
+    {
+      printf("Receive packet with ACK and retries, state %d\n",e);
+
+      for (unsigned int i = 0; i < sx1272.packet_received.length; i++)
+      {
+        my_packet[i] = (char)sx1272.packet_received.data[i];
+      }
+      printf("Message: %s\n", my_packet);
+    }
+    else {
+      printf("Receive packet with ACK and retries, state %d\n",e);
+    }
   }
  }
  pthread_exit(NULL);
