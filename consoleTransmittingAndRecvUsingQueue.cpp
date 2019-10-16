@@ -80,7 +80,7 @@ void setup()
   // Set the LoRa into receive mode by default
   e = sx1272.receive();
   if (e)
-    cout << 'Unable to enter receive mode' << endl;
+    cout << "Unable to enter receive mode" << endl;
   
   // Print a success message
   printf("SX1272 successfully configured\n\n");
@@ -101,7 +101,7 @@ void *get_data_from_console(void *threadid)
         // Packet recieved from user
         if (!packet.empty()) {        
             Q.push(packet);
-            cout << 'Pushed ' << packet << ' into queue.' << endl;
+            cout << "Pushed " << packet << " into queue." << endl;
             toSend = true;
         }
   
@@ -125,7 +125,7 @@ void *transmit_and_recieve(void *threadid)
           char *cstr = new char[packetToSend.length() + 1];
           strcpy(cstr, packetToSend.c_str());
           if (!sx1272.sendPacketTimeout(0, cstr)) {
-              cout << 'Error sending packet' << endl;
+              cout << "Error sending packet" << endl;
           }
 
           // Reset flag after sending if there is nothing else to send
@@ -145,7 +145,7 @@ void *transmit_and_recieve(void *threadid)
                 printf("Message: %s\n", my_packet);
           }
           else {
-              cout << 'No data received.' << endl;
+              cout << "No data received." << endl;
           }
       }
  }
