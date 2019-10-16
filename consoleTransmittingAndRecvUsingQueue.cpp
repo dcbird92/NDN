@@ -146,9 +146,6 @@ void *transmit_and_recieve(void *threadid)
                 }
                 printf("Message: %s\n", my_packet);
           }
-          else {
-              cout << "No data received." << endl;
-          }
       }
  }
 }
