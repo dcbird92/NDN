@@ -123,7 +123,8 @@ void *transmit_and_recieve(void *threadid)
           pthread_mutex_lock(&threadLock);
 
           // Attempt to enter transmit mode
-          string packetToSend = Q.pop();
+          string packetToSend = Q.front();
+          Q.pop();
           char *cstr = new char[packetToSend.length() + 1];
           strcpy(cstr, packetToSend.c_str());
           if ((e = sx1272.sendPacketTimeout(0, cstr)) != 0) {
