@@ -93,7 +93,7 @@ void *get_data_from_console(void *threadid)
 
         // Wait for data input!
         std::string packet;
-        line(std::cin, packet);
+        getline(std::cin, packet);
         
         // Getting the lock on queue using mutex 
         pthread_mutex_lock(&threadLock); 
