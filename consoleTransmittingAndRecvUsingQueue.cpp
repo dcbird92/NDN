@@ -126,8 +126,8 @@ void *transmit_and_recieve(void *threadid)
           string packetToSend = Q.front();
           char *cstr = new char[packetToSend.length() + 1];
           strcpy(cstr, packetToSend.c_str());
-          if (!sx1272.sendPacketTimeout(0, cstr)) {
-              cout << "Error sending packet" << endl;
+          if ((e = sx1272.sendPacketTimeout(0, cstr)) != 0) {
+              cout << "Error sending packet" << e << endl;
           }
 
           // Reset flag after sending if there is nothing else to send
