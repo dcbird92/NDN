@@ -123,7 +123,7 @@ void *transmit_and_recieve(void *threadid)
           pthread_mutex_lock(&threadLock);
 
           // Attempt to enter transmit mode
-          string packetToSend = Q.front();
+          string packetToSend = Q.pop();
           char *cstr = new char[packetToSend.length() + 1];
           strcpy(cstr, packetToSend.c_str());
           if ((e = sx1272.sendPacketTimeout(0, cstr)) != 0) {
@@ -132,6 +132,7 @@ void *transmit_and_recieve(void *threadid)
 
           // Reset flag after sending if there is nothing else to send
           toSend = Q.empty() == false;
+          cout << "toSend: " << toSend << endl;
 
           // After sending, unlock the queue and enter recieve mode again
           sx1272.receive();
@@ -139,7 +140,8 @@ void *transmit_and_recieve(void *threadid)
       }
       // Otherwise check and see if there is available data (only check for 10 ms)
       else {
-          if (sx1272.availableData(10)) {
+          e = sx1272.receivePacketTimeout(10000);
+          if (e == 0) {
                 for (unsigned int i = 0; i < sx1272.packet_received.length; i++)
                 {
                     my_packet[i] = (char)sx1272.packet_received.data[i];
