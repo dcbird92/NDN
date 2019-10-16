@@ -93,21 +93,23 @@ void *get_data_from_console(void *threadid)
 
         // Wait for data input!
         std::string packet;
-        getline(std::cin, packet);
-
+        line(std::cin, packet);
+        
         // Getting the lock on queue using mutex 
         pthread_mutex_lock(&threadLock); 
-
+        
         // Packet recieved from user
         if (!packet.empty()) {        
             Q.push(packet);
             cout << "Pushed " << packet << " into queue." << endl;
             toSend = true;
         }
-  
+    
         // Get the mutex unlocked 
         pthread_mutex_unlock(&threadLock); 
     }
+    
+    cout << "Exiting..." << Q.size() << endl;
 }
 
 void *transmit_and_recieve(void *threadid)
@@ -154,18 +156,25 @@ void *transmit_and_recieve(void *threadid)
 int main (){
   pthread_t receive, transmit;
   int rc;
+  int tone;
+  int ttwo;
+  
+  tone = 1;
+  ttwo = 2; 
 
   setup();
-  rc = pthread_create(&transmit, NULL, get_data_from_console, NULL);
-  if(rc)
-    cout<<"Error in getting input from console"; exit(-1);
+  rc = pthread_create(&transmit, NULL, get_data_from_console, (void *)tone);
+  if(rc) {
+    cout<<"Error in getting input from console"; exit(-1);    
+  }
   rc = pthread_create(&receive, NULL, transmit_and_recieve, NULL);
-  if(rc)
+  if(rc) {
     cout<<"Error in transmitting and recieving"; exit(-1);
+  }
 
   // Wait for the threads to join (user would have to ctrl-c)
-  pthread_join(receive, NULL);
-  pthread_join(transmit, NULL);
+   pthread_join(receive, NULL);
+   pthread_join(transmit, NULL);
 }
 
         
