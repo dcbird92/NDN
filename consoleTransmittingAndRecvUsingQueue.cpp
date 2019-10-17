@@ -141,7 +141,8 @@ void *transmit_and_recieve(void *threadid)
       }
       // Otherwise check and see if there is available data (only check for 10 ms)
       else {
-          e = sx1272.receivePacketTimeout(1000);
+          e = sx1272.receivePacketTimeout(500);
+          
           if (e == 0) {
                 for (unsigned int i = 0; i < sx1272.packet_received.length; i++)
                 {
