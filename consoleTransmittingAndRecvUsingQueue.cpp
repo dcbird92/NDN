@@ -139,16 +139,23 @@ void *transmit_and_recieve(void *threadid)
           sx1272.receive();
           pthread_mutex_unlock(&threadLock);
       }
-      // Otherwise check and see if there is available data (only check for 10 ms)
+      // Otherwise check and see if there is available data
       else {
-          e = sx1272.receivePacketTimeout(250);
-          
-          if (e == 0) {
-                for (unsigned int i = 0; i < sx1272.packet_received.length; i++)
-                {
-                    my_packet[i] = (char)sx1272.packet_received.data[i];
-                }
-                printf("Message: %s\n", my_packet);
+          if (sx1272.checkForData()) {
+            printf("1\n");
+            bool dataToConsume = true;
+            while (dataToConsume) {
+              printf("2\n");
+              e = sx1272.receivePacketTimeout(250);
+              if (e == 0) {
+                    for (unsigned int i = 0; i < sx1272.packet_received.length; i++)
+                    {
+                        my_packet[i] = (char)sx1272.packet_received.data[i];
+                    }
+                    printf("Message: %s\n", my_packet);
+              }
+              dataToConsume = sx1272.checkForData();
+            }
           }
       }
  }

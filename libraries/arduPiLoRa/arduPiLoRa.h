@@ -793,6 +793,11 @@ public:
 	*/
 	int8_t getPacket();
 
+	/*
+		Checks registers just to see if a header was recieved
+	*/
+	boolean checkForData();
+
 	//! It receives and gets a packet from FIFO, if it arrives before ending 'wait' time.
 	/*!
 	 *

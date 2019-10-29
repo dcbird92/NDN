@@ -3237,6 +3237,21 @@ boolean	SX1272::availableData()
 }
 
 /*
+	Checks to see if there is any data available with no timeout/delay
+*/
+boolean SX1272::checkForData()
+{
+	byte value;
+	value = readRegister(REG_IRQ_FLAGS);
+
+	// Checks the header for a received packet
+	if( bitRead(value, 4) == 1 ) {
+		return true;
+	}
+	return false;
+}
+
+/*
  Function: If a packet is received, checks its destination.
  Returns: Boolean that's 'true' if the packet is for the module and
 		  it's 'false' if the packet is not for the module.
