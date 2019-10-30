@@ -146,7 +146,7 @@ void *transmit_and_recieve(void *threadid)
             bool dataToConsume = true;
             while (dataToConsume) {
               printf("2\n");
-              e = sx1272.receivePacketTimeout(250);
+              e = sx1272.getPacket();
               if (e == 0) {
                     for (unsigned int i = 0; i < sx1272.packet_received.length; i++)
                     {
