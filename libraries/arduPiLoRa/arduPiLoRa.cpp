@@ -4099,7 +4099,7 @@ uint8_t SX1272::setPacket(uint8_t dest, char *payload)
 	}
 	else
 	{
-		printf("Retrying!\n");
+		printf("Retrying! Retries: %u\n", _retries);
 		if( _retries == 1 )
 		{
 			packet_sent.length++;
