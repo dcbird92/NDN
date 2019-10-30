@@ -314,7 +314,7 @@ public:
 		_packetNumber = 0;
 		_reception = CORRECT_PACKET;
 		_retries = 0;
-		_maxRetries = 3;
+		_maxRetries = 0;
 		packet_sent.retry = _retries;
 	};
 
