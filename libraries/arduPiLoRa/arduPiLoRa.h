@@ -798,6 +798,11 @@ public:
 	*/
 	boolean checkForData();
 
+	/*
+		Get back the current packet length being stored, for some reason not being updated correctly...
+	*/
+	uint8_t getCurrentPacketLength();
+
 	//! It receives and gets a packet from FIFO, if it arrives before ending 'wait' time.
 	/*!
 	 *

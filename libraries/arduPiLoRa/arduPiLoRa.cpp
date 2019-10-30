@@ -3398,6 +3398,11 @@ uint8_t SX1272::getPacketMAXTimeout()
 	return getPacket(MAX_TIMEOUT);
 }
 
+uint8_t SX1272::getCurrentPacketLength()
+{
+	return packet_received.length;
+}
+
 /*
  Function: It gets and stores a packet if it is received.
  Returns:  Integer that determines if there has been any error

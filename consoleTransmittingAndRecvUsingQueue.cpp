@@ -148,7 +148,9 @@ void *transmit_and_recieve(void *threadid)
               printf("2\n");
               e = sx1272.getPacket();
               if (e == 0) {
-                    for (unsigned int i = 0; i < sx1272.packet_received.length; i++)
+                    uint8_t packetLength = sx1272.getCurrentPacketLength();
+                    printf("Packet length: %ui", packetLength);
+                    for (unsigned int i = 0; i < packetLength; i++)
                     {
                         my_packet[i] = (char)sx1272.packet_received.data[i];
                     }
