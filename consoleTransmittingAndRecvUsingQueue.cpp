@@ -127,7 +127,6 @@ void *transmit_and_recieve(void *threadid)
           Q.pop();
           char *cstr = new char[packetToSend.length() + 1];
           strcpy(cstr, packetToSend.c_str());
-          printf("Sending: %s\n", cstr);
           if ((e = sx1272.sendPacketTimeout(0, cstr)) != 0) {
               cout << "Error sending packet" << e << endl;
           }

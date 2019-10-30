@@ -4094,7 +4094,6 @@ uint8_t SX1272::setPacket(uint8_t dest, char *payload)
 	_reception = CORRECT_PACKET;	// Updating incorrect value
 	if( _retries == 0 )
 	{ // Updating this values only if is not going to re-send the last packet
-		printf("Sending new packet!\n");
 		state = setDestination(dest);	// Setting destination in packet structure
 		if( state == 0 )
 		{
@@ -4103,7 +4102,6 @@ uint8_t SX1272::setPacket(uint8_t dest, char *payload)
 	}
 	else
 	{
-		printf("Retrying! Retries: %u\n", _retries);
 		if( _retries == 1 )
 		{
 			packet_sent.length++;
@@ -4405,7 +4403,6 @@ uint8_t SX1272::sendPacketTimeout(uint8_t dest, char *payload)
 		printf("\n");
 		printf("Starting 'sendPacketTimeout'\n");
 	#endif
-	printf("Setting packet with payload: %s\n", payload);
 	state = setPacket(dest, payload);	// Setting a packet with 'dest' destination
 	if (state == 0)								// and writing it in FIFO.
 	{
