@@ -101,16 +101,13 @@ void *get_data_from_console(void *threadid)
         // Packet recieved from user
         if (!packet.empty()) {        
             Q.push(packet);
-            cout << "Pushed " << packet << " into queue." << endl;
             toSend = true;
         }
     
         // Get the mutex unlocked 
         pthread_mutex_unlock(&threadLock); 
     }
-    
-    cout << "Exiting..." << Q.size() << endl;
-}
+  }
 
 void *transmit_and_recieve(void *threadid)
 {
@@ -133,7 +130,6 @@ void *transmit_and_recieve(void *threadid)
 
           // Reset flag after sending if there is nothing else to send
           toSend = Q.empty() == false;
-          cout << "toSend: " << toSend << endl;
 
           // After sending, unlock the queue and enter recieve mode again
           sx1272.receive();
@@ -142,10 +138,8 @@ void *transmit_and_recieve(void *threadid)
       // Otherwise check and see if there is available data
       else {
           if (sx1272.checkForData()) {
-            printf("1\n");
             bool dataToConsume = true;
             while (dataToConsume) {
-              printf("2\n");
               e = sx1272.getPacket();
               if (e == 0) {
                     uint8_t packetLength = sx1272.getCurrentPacketLength();
@@ -158,16 +152,17 @@ void *transmit_and_recieve(void *threadid)
                     // The index is not being offset... must account for packet overhead in the length
                     i -= 5;
 
-                    printf("i: %u and length: %u\n", i, packetLength);
-
                     // Reset null terminator
                     my_packet[i] = '\0';
 
                     printf("Message: %s\n", my_packet);
               }
               else {
+                // TODO: request data back?
                 printf("Error, e: %d\n", e);
               }
+
+              // Continue reading data if available
               dataToConsume = sx1272.checkForData();
             }
           }
