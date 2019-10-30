@@ -134,7 +134,6 @@ void *transmit_and_recieve(void *threadid)
 
           // Reset flag after sending if there is nothing else to send
           toSend = Q.empty() == false;
-          cout << "toSend: " << toSend << endl;
 
           // After sending, unlock the queue and enter recieve mode again
           sx1272.receive();
@@ -143,10 +142,8 @@ void *transmit_and_recieve(void *threadid)
       // Otherwise check and see if there is available data
       else {
           if (sx1272.checkForData()) {
-            printf("1\n");
             bool dataToConsume = true;
             while (dataToConsume) {
-              printf("2\n");
               e = sx1272.getPacket();
               if (e == 0) {
                     uint8_t packetLength = sx1272.getCurrentPacketLength();
@@ -156,10 +153,7 @@ void *transmit_and_recieve(void *threadid)
                         my_packet[i] = (char)sx1272.packet_received.data[i];
                     }
 
-                    // The index is not being offset... must account for packet overhead in the length
-                    i -= 5;
-
-                    printf("i: %u and length: %u\n", i, packetLength);
+                    // printf("i: %u and length: %u\n", i, packetLength);
 
                     // Reset null terminator
                     my_packet[i] = '\0';
