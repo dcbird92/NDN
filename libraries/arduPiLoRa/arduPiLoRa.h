@@ -41,7 +41,7 @@
  * Definitions & Declarations
  *****************************************************************************/
 
-#define SX1272_debug_mode 1
+#define SX1272_debug_mode 0
 
 #define SX1272_SS 10
 
