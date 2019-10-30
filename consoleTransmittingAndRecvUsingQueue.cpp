@@ -154,6 +154,9 @@ void *transmit_and_recieve(void *threadid)
                     }
                     printf("Message: %s\n", my_packet);
               }
+              else {
+                printf("Error, e: %d\n", e);
+              }
               dataToConsume = sx1272.checkForData();
             }
           }
