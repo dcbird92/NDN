@@ -155,6 +155,8 @@ void *transmit_and_recieve(void *threadid)
                         my_packet[i] = (char)sx1272.packet_received.data[i];
                     }
 
+                    printf("i: %ui and length: %ui\n", i, packetLength);
+
                     // Reset null terminator
                     my_packet[i] = '\n';
 
