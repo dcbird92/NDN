@@ -3586,6 +3586,7 @@ int8_t SX1272::getPacket(uint16_t wait)
 		state = 1;
 		if( (_reception == INCORRECT_PACKET) && (_retries < _maxRetries) )
 		{
+			printf("Inc5\n");
 			_retries++;
 			#if (SX1272_debug_mode > 0)
 				printf("## Retrying to send the last packet ##\n");
@@ -4921,6 +4922,7 @@ uint8_t SX1272::sendPacketTimeoutACKRetries(uint8_t dest, char *payload)
 	while( (state != 0) && (_retries <= _maxRetries) )
 	{
 		state = sendPacketTimeoutACK(dest, payload);
+		printf("Inc1\n");
 		_retries++;
 	}
 	_retries = 0;
@@ -4949,6 +4951,7 @@ uint8_t SX1272::sendPacketTimeoutACKRetries(uint8_t dest, uint8_t *payload, uint
 	while((state != 0) && (_retries <= _maxRetries))
 	{
 		state = sendPacketTimeoutACK(dest, payload, length16);
+		printf("Inc2\n");
 		_retries++;
 
 	}
@@ -4978,6 +4981,7 @@ uint8_t SX1272::sendPacketTimeoutACKRetries(uint8_t dest, char *payload, uint16_
 	while((state != 0) && (_retries <= _maxRetries))
 	{
 		state = sendPacketTimeoutACK(dest, payload, wait);
+		printf("Inc3\n");
 		_retries++;
 	}
 	_retries = 0;
@@ -5006,6 +5010,7 @@ uint8_t SX1272::sendPacketTimeoutACKRetries(uint8_t dest, uint8_t *payload, uint
 	while((state != 0) && (_retries <= _maxRetries))
 	{
 		state = sendPacketTimeoutACK(dest, payload, length16, wait);
+		printf("Inc4\n");
 		_retries++;
 	}
 	_retries = 0;
