@@ -155,10 +155,13 @@ void *transmit_and_recieve(void *threadid)
                         my_packet[i] = (char)sx1272.packet_received.data[i];
                     }
 
-                    printf("i: %ui and length: %ui\n", i, packetLength);
+                    // The index is not being offset... must account for packet overhead in the length
+                    i -= 5;
+
+                    printf("i: %u and length: %u\n", i, packetLength);
 
                     // Reset null terminator
-                    my_packet[i] = '\n';
+                    my_packet[i] = '\0';
 
                     printf("Message: %s\n", my_packet);
               }
