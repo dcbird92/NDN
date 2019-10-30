@@ -3400,7 +3400,7 @@ uint8_t SX1272::getPacketMAXTimeout()
 
 uint8_t SX1272::getCurrentPacketLength()
 {
-	return packet_received.length - 5;
+	return packet_received.length;
 }
 
 /*

@@ -149,6 +149,9 @@ void *transmit_and_recieve(void *threadid)
                         my_packet[i] = (char)sx1272.packet_received.data[i];
                     }
 
+                    // The index is not being offset... must account for packet overhead in the length
+                    i -= 5;
+
                     // Reset null terminator
                     my_packet[i] = '\0';
 
