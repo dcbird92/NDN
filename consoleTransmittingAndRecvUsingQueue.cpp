@@ -101,7 +101,6 @@ void *get_data_from_console(void *threadid)
         // Packet recieved from user
         if (!packet.empty()) {        
             Q.push(packet);
-            cout << "Pushed " << packet << " into queue." << endl;
             toSend = true;
         }
     
