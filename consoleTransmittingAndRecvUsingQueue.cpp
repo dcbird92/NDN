@@ -87,6 +87,9 @@ void setup()
   delay(1000);
 }
 
+/*
+* Function used for continuously getting data from the console from the user to send from one pi to another
+*/
 void *get_data_from_console(void *threadid)
 {
     while (1) { 
@@ -111,6 +114,9 @@ void *get_data_from_console(void *threadid)
     cout << "Exiting..." << Q.size() << endl;
 }
 
+/*
+* Function used for switching from receiving --> transmitting --> receiving for the LoRa
+*/
 void *transmit_and_recieve(void *threadid)
 {
   cout << "Creating transmit and receive thread\n";
