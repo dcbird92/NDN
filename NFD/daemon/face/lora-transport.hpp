@@ -1,7 +1,6 @@
 /**
- * Header file used for creating the Lo-Ra transmission
- * 
- * 
+ * Header file used for creating the Lo-Ra transmission, which
+ * will be used as another medium for NDN transmission
  */
 
 #include "transport.hpp"
@@ -33,17 +32,17 @@ class LoRaTransport : public Transport
     void
     receivePayload();
 
-    /**
-     * @brief Is used to setup the LoRa and set all the correct bits for the LoRa (intialization step)
-     */ 
-    void
-    setup();
-
 protected:
     LoRaTransport();
 
     void
     doClose() final;
+
+    /**
+     * @brief Is used to setup the LoRa and set all the correct bits for the LoRa (intialization step)
+     */ 
+    void
+    setup();
 
 private:
     void
