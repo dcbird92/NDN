@@ -29,13 +29,9 @@ class LoRaTransport : public Transport
 
     /**
    * @brief Processes the payload of an incoming frame
-   * @param payload Pointer to the first byte of data after the Ethernet header
-   * @param length Payload length
-   * @param sender Sender address
    */
     void
-    receivePayload(const uint8_t *payload, size_t length,
-                   const ethernet::Address &sender);
+    receivePayload();
 
     /**
      * @brief Is used to setup the LoRa and set all the correct bits for the LoRa (intialization step)
@@ -48,12 +44,6 @@ protected:
 
     void
     doClose() final;
-
-    bool
-    hasRecentlyReceived() const
-    {
-        return m_hasRecentlyReceived;
-    }
 
 private:
     void
@@ -77,7 +67,7 @@ private:
     // Variables
     private:
         int e;
-        string m;
+        std::string m;
         char my_packet[256];
         bool toSend;
 
