@@ -57,9 +57,6 @@ protected:
 
 private:
     void
-    handleNetifStateChange(ndn::net::InterfaceState netifState);
-
-    void
     doSend(const Block &packet, const EndpointId &endpoint) final;
 
     /**
@@ -79,6 +76,19 @@ private:
 
     // Variables
     private:
+        int e;
+        string m;
+        char my_packet[256];
+        bool toSend;
+
+        // Creating mutexes for shared queue and conditions for when data is produced from console
+        pthread_mutex_t threadLock = std::PTHREAD_MUTEX_INITIALIZER; 
+        
+        pthread_cond_t dataSent =  
+                            std::PTHREAD_COND_INITIALIZER; 
+
+        // Shared queue 
+        std::queue<std::string> Q; 
 }
 
 } // namespace face
