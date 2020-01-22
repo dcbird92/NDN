@@ -6,7 +6,6 @@
 #include "transport.hpp"
 #include <ndn-cxx/net/network-interface.hpp>
 #include <string>
-#include <iostream>
 #include <pthread.h>
 #include <queue>
 

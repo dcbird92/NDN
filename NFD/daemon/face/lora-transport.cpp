@@ -64,7 +64,7 @@ LoRaTransport::setup() {
   // Set the LoRa into receive mode by default
   e = sx1272.receive();
   if (e)
-    cout << "Unable to enter receive mode" << endl;
+    printf("Unable to enter receive mode");
   
   // Print a success message
   printf("SX1272 successfully configured\n\n");
