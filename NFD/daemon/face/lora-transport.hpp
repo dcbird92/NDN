@@ -62,11 +62,14 @@ private:
     void
     handleError(const std::string &errorMessage);
 
+    void
+    transmit_and_recieve(void *threadid);
+
     // Variables
     private:
         int e;
         std::string m;
-        char my_packet[256];
+        char my_packet[2048];
         bool toSend;
 
         // Creating mutexes for shared queue and conditions for when data is produced from console
@@ -75,8 +78,8 @@ private:
         pthread_cond_t dataSent =  
                             std::PTHREAD_COND_INITIALIZER; 
 
-        // Shared queue 
-        std::queue<std::string> Q; 
+        // Packet to be sent when doSend is triggered
+        const Block &packet;
 }
 
 } // namespace face

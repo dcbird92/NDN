@@ -11,17 +11,30 @@ namespace face {
 LoRaTransport::LoRaTransport() {
 
     // Set all of the static variables associated with this transmission 
-    setLocalUri(const FaceUri& uri);
-    setRemoteUri(const FaceUri& uri);
-    setScope(ndn::nfd::FaceScope scope);
-    setLinkType(ndn::nfd::LinkType linkType);
-    setMtu(ssize_t mtu);
-    setSendQueueCapacity(ssize_t sendQueueCapacity);
-    setState(TransportState newState);
-    setExpirationTime(const time::steady_clock::TimePoint& expirationTime);
+    // ** COME BACK TO THIS? **
+    // setLocalUri(const FaceUri& uri);
+    // setRemoteUri(const FaceUri& uri);
+    // setScope(ndn::nfd::FaceScope scope);
+    // setLinkType(ndn::nfd::LinkType linkType);
+    // setMtu(ssize_t mtu);
+    // setSendQueueCapacity(ssize_t sendQueueCapacity);
+    // setState(TransportState newState);
+    // setExpirationTime(const time::steady_clock::TimePoint& expirationTime);
 
     // Setup the lora chip
     setup();
+
+    // Create the neccessary thread to begin receving and transmitting
+    pthread_t receive, transmit;
+    int rc;
+    
+    rc = pthread_create(&receive, NULL, transmit_and_recieve, NULL);
+    if(rc) {
+      handleError("Unable to create initial thread to create receive and transmitting thread: " + rc);
+    }
+
+    // Wait for the threads to join (user would have to ctrl-c)
+    pthread_join(receive, NULL);
 }
 
 LoRaTransport::receivePayload() {
@@ -31,43 +44,35 @@ LoRaTransport::receivePayload() {
 
 LoRaTransport::setup() {
   // Print a start message
-  printf("SX1272 module and Raspberry Pi: send packets with ACK and retries\n");
   
   // Power ON the module
-  e = sx1272.ON();
-  printf("Setting power ON: state %d\n", e);
+  nfd::face::LoRaTransport::e = sx1272.ON();
   
   // Set transmission mode
-  e = sx1272.setMode(4);
-  printf("Setting Mode: state %d\n", e);
+  nfd::face::LoRaTransport::e = sx1272.setMode(4);
   
   // Set header
-  e = sx1272.setHeaderON();
-  printf("Setting Header ON: state %d\n", e);
+  nfd::face::LoRaTransport::e = sx1272.setHeaderON();
   
   // Select frequency channel
-  e = sx1272.setChannel(CH_10_868);
-  printf("Setting Channel: state %d\n", e);
+  nfd::face::LoRaTransport::e = sx1272.setChannel(CH_10_868);
   
   // Set CRC
-  e = sx1272.setCRC_ON();
-  printf("Setting CRC ON: state %d\n", e);
+  nfd::face::LoRaTransport::e = sx1272.setCRC_ON();
   
   // Select output power (Max, High or Low)
-  e = sx1272.setPower('H');
-  printf("Setting Power: state %d\n", e);
+  nfd::face::LoRaTransport::e = sx1272.setPower('H');
   
   // Set the node address
-  e = sx1272.setNodeAddress(3);
-  printf("Setting Node address: state %d\n", e);
+  nfd::face::LoRaTransport::e = sx1272.setNodeAddress(3);
 
   // Set the LoRa into receive mode by default
-  e = sx1272.receive();
-  if (e)
-    printf("Unable to enter receive mode");
+  nfd::face::LoRaTransport::e = sx1272.receive();
+  if (nfd::face::LoRaTransport::e)
+    handleError("Unable to enter receive mode");
   
   // Print a success message
-  printf("SX1272 successfully configured\n\n");
+  NFD_LOG_FACE_TRACE("SX1272 successfully configured\n\n");
   delay(1000);
 }
 
@@ -79,27 +84,137 @@ LoRaTransport::doClose() {
         return;
     }
 
-    this->setState(TransportState::CLOSED);
+  this->setState(TransportState::FAILED);
 }
 
-LoRaTransport::doSend(const Block &packet, const EndpointId &endpoint) {
-    
+LoRaTransport::doSend(const Block &packet) {
+  NFD_LOG_FACE_TRACE(__func__);
+
+  // Set the flag high that we have a packet to transmit, and grab the data to send
+  pthread_mutex_lock(nfd::face::LoRaTransport::&threadLock);
+  nfd::face::LoRaTransport::packet = packet;
+  nfd::face::LoRaTransport::toSend = true;
+  pthread_mutex_unlock(nfd::face::LoRaTransport::&threadLock);
 }
 
 LoRaTransport::sendPacket(const ndn::Block &block) {
+  ndn::EncodingBuffer buffer(block);
 
+  if (block.size() <= 0) {
+    NFD_LOG_FACE_ERROR("Trying to send a packet with no size");
+  }
+
+  // copy the buffer into a cstr so we can send it
+  char *cstr = new char[buffer.size() + 1];
+  uint8_t *buff = buffer.buf();
+  for (int i = 0; i < buffer.size(); i++) {
+    cstr[i] = buff[i];
+  }
+  if ((nfd::face::LoRaTransport::e = sx1272.sendPacketTimeout(0, cstr)) != 0) {
+      handleError("Send operation failed: " + nfd::face::LoRaTransport::e);
+  }  
+  else
+    // print block size because we don't want to count the padding in buffer
+    NFD_LOG_FACE_TRACE("Successfully sent: " << block.size() << " bytes");
+
+  // After sending enter recieve mode again
+  sx1272.receive();
+  free(cstr);
 }
 
-LoRaTransport::asyncRead() {
+/*
+* Function used for switching from receiving --> transmitting --> receiving for the LoRa
+*/
+LoRaTransport::transmit_and_recieve(void *threadid)
+{
 
+  NFD_LOG_FACE_TRACE("Starting Lo-Ra thread");
+  while(true){
+      pthread_mutex_lock(nfd::face::LoRaTransport::&threadLock);
+      // Check and see if there is something to send
+      if (nfd::face::LoRaTransport::toSend) {
+
+          ndn::EncodingBuffer buffer(nfd::face::LoRaTransport::packet);
+
+          if (buffer.size() <= 0) {
+            NFD_LOG_FACE_TRACE("Trying to send a packet with no size");
+          }
+
+          // copy the buffer into a cstr so we can send it
+          char *cstr = new char[buffer.size() + 1];
+          uint8_t *buff = buffer.buf();
+          for (int i = 0; i < buffer.size(); i++) {
+            cstr[i] = buff[i];
+          }
+          if ((nfd::face::LoRaTransport::e = sx1272.sendPacketTimeout(0, cstr)) != 0) {
+              handleError("Send operation failed: " + nfd::face::LoRaTransport::e);
+          }  
+          else
+            // print block size because we don't want to count the padding in buffer
+            NFD_LOG_FACE_TRACE("Successfully sent: " << buffer.size() << " bytes");
+
+          // After sending enter recieve mode again
+          sx1272.receive();
+          free(cstr);
+          pthread_mutex_unlock(&threadLock);
+      }
+      // Otherwise check and see if there is available data
+      else {
+
+          // No need to keep the lock here...
+          pthread_mutex_unlock(nfd::face::LoRaTransport::&threadLock);
+
+          // Check to see if the LoRa has received data... if so handle it
+          if (sx1272.checkForData()) {
+            handleRead();
+          }
+      }
+  }
 }
 
-LoRaTransport::handleRead(const boost::system::error_code &error) {
+LoRaTransport::handleRead() {
+    bool dataToConsume = true;
+    unsigned int i;
+    while (dataToConsume) {
+      nfd::face::LoRaTransport::e = sx1272.getPacket();
+      if (nfd::face::LoRaTransport::e == 0) {
+            uint8_t packetLength = sx1272.getCurrentPacketLength();
+            for (i = 0; i < packetLength; i++)
+            {
+                my_packet[i] = (char)sx1272.packet_received.data[i];
+            }
 
-}
+            // Reset null terminator
+            my_packet[i] = '\0';
+
+            NFD_LOG_FACE_TRACE("Received packet: " + my_packet);
+      }
+      else {
+        handleError("Unable to get packet data: " + nfd::face::LoRaTransport::e)
+      }
+      dataToConsume = sx1272.checkForData();
+    }
+
+    bool isOk = false;
+    Block element;
+    std::tie(isOk, element) = Block::fromBuffer(my_packet, i);
+    if (!isOk) {
+      NFD_LOG_FACE_WARN("Failed to parse incoming packet from " << sender);
+      // This packet won't extend the face lifetime
+      return;
+    }
+    this->receive(element);
+} 
 
 LoRaTransport::handleError(const std::string &errorMessage) {
+  if (getPersistency() == ndn::nfd::FACE_PERSISTENCY_PERMANENT) {
+    NFD_LOG_FACE_DEBUG("Permanent face ignores error: " << errorMessage);
+    return;
+  }
 
+  NFD_LOG_FACE_ERROR(errorMessage);
+  this->setState(TransportState::FAILED);
+  doClose();
 }
 
 }
