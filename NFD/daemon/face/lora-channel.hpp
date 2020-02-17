@@ -34,7 +34,7 @@ namespace face {
 /**
  * \brief Class implementing LoRa-based channel to create faces
  */
-class LoraChannel : public Channel
+class LoRaChannel : public Channel
 {
 
 public:
@@ -49,7 +49,7 @@ public:
     }
   };
 
-  LoraChannel();
+  LoRaChannel();
 
   void
   createFace( const FaceParams& params,

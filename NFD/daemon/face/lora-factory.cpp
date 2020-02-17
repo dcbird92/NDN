@@ -15,11 +15,11 @@ NFD_REGISTER_PROTOCOL_FACTORY(LoRaFactory);
 const std::string&
 LoRaFactory::getId() noexcept
 {
-  static std::string id("udp");
+  static std::string id("lora");
   return id;
 }
 
-LoRaFactory::UdpFactory(const CtorParams& params)
+LoRaFactory::LoRaFactory(const CtorParams& params)
   : ProtocolFactory(params)
 {
 }
