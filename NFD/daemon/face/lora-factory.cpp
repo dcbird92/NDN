@@ -46,7 +46,7 @@ LoRaFactory::doCreateFace(const CreateFaceRequest& req,
   onFailure(504, "No LoRa available to connect");
 }
 
-shared_ptr<UdpChannel>
+shared_ptr<LoRaChannel>
 LoRaFactory::createChannel( time::nanoseconds idleTimeout)
 {
   auto it = m_channels.find("default");
