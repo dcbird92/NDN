@@ -24,7 +24,7 @@ public:
   LoRaFactory(const CtorParams& params);
 
   /**
-   * \brief Create LoRa-based channel using udp::Endpoint
+   * \brief Create LoRa-based channel
    *
    * If this method is called twice the second time it won't do anything
    * because the lora will have been setup already

@@ -35,6 +35,15 @@ LoRaFactory::doCreateFace(const CreateFaceRequest& req,
                          const FaceCreatedCallback& onCreated,
                          const FaceCreationFailedCallback& onFailure)
 {
+
+  for (const auto& i : m_channels) {
+      i.second->createFace(req.params, onCreated);
+      return;
+    }
+  }
+
+  NFD_LOG_TRACE("No LoRas available to connect to ");
+  onFailure(504, "No LoRa available to connect");
 }
 
 shared_ptr<UdpChannel>
