@@ -44,29 +44,29 @@ void LoRaTransport::setup() {
   // Print a start message
   
   // Power ON the module
-  nfd::face::LoRaTransport::e = sx1272.ON();
+  e = sx1272.ON();
   
   // Set transmission mode
-  nfd::face::LoRaTransport::e = sx1272.setMode(4);
+  e = sx1272.setMode(4);
   
   // Set header
-  nfd::face::LoRaTransport::e = sx1272.setHeaderON();
+  e = sx1272.setHeaderON();
   
   // Select frequency channel
-  nfd::face::LoRaTransport::e = sx1272.setChannel(CH_10_868);
+  e = sx1272.setChannel(CH_10_868);
   
   // Set CRC
-  nfd::face::LoRaTransport::e = sx1272.setCRC_ON();
+  e = sx1272.setCRC_ON();
   
   // Select output power (Max, High or Low)
-  nfd::face::LoRaTransport::e = sx1272.setPower('H');
+  e = sx1272.setPower('H');
   
   // Set the node address
-  nfd::face::LoRaTransport::e = sx1272.setNodeAddress(3);
+  e = sx1272.setNodeAddress(3);
 
   // Set the LoRa into receive mode by default
-  nfd::face::LoRaTransport::e = sx1272.receive();
-  if (nfd::face::LoRaTransport::e)
+  e = sx1272.receive();
+  if (e)
     handleError("Unable to enter receive mode");
   
   // Print a success message
@@ -101,11 +101,11 @@ void LoRaTransport::sendPacket(const ndn::Block &block) {
   // copy the buffer into a cstr so we can send it
   char *cstr = new char[buffer.size() + 1];
   uint8_t *buff = buffer.buf();
-  for (int i = 0; i < buffer.size(); i++) {
+  for (size_t i = 0; i < buffer.size(); i++) {
     cstr[i] = buff[i];
   }
-  if ((nfd::face::LoRaTransport::e = sx1272.sendPacketTimeout(0, cstr)) != 0) {
-      handleError("Send operation failed: " + nfd::face::LoRaTransport::e);
+  if ((e = sx1272.sendPacketTimeout(0, cstr)) != 0) {
+      handleError("Send operation failed: " + std::to_string(e));
   }  
   else
     // print block size because we don't want to count the padding in buffer
@@ -141,7 +141,7 @@ void LoRaTransport::transmit_and_recieve()
             cstr[i] = buff[i];
           }
           if ((nfd::face::LoRaTransport::e = sx1272.sendPacketTimeout(0, cstr)) != 0) {
-              handleError("Send operation failed: " + nfd::face::LoRaTransport::e);
+              handleError("Send operation failed: " + std::to_string(e));
           }  
           else
             // print block size because we don't want to count the padding in buffer
