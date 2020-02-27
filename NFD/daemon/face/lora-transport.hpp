@@ -46,7 +46,7 @@ protected:
 
 private:
     void
-    doSend(const Block &packet) final;
+    doSend(const Block &packet, const EndpointId& endpoint) final;
 
     /**
    * @brief Sends the specified TLV block on the network wrapped in an Ethernet frame
@@ -58,7 +58,7 @@ private:
     asyncRead();
 
     void
-    handleRead(const boost::system::error_code &error);
+    handleRead();
 
     void
     handleError(const std::string &errorMessage);
@@ -79,8 +79,6 @@ private:
         pthread_cond_t dataSent =  
                             PTHREAD_COND_INITIALIZER; 
 
-        // Packet to be sent when doSend is triggered
-        const Block &packet;
 };
 
 } // namespace face
