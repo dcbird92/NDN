@@ -27,7 +27,7 @@ LoRaTransport::LoRaTransport() {
     setup();
 
     // Create the neccessary thread to begin receving and transmitting
-    pthread_t receive, transmit;
+    pthread_t receive;
     int rc;
     
     rc = pthread_create(&receive, NULL, transmit_and_recieve, NULL);
@@ -119,17 +119,14 @@ void LoRaTransport::sendPacket(const ndn::Block &block) {
 /*
 * Function used for switching from receiving --> transmitting --> receiving for the LoRa
 */
-void LoRaTransport::transmit_and_recieve()
+void* LoRaTransport::transmit_and_recieve()
 {
-
   NFD_LOG_FACE_TRACE("Starting Lo-Ra thread");
   while(true){
       pthread_mutex_lock(&threadLock);
       // Check and see if there is something to send
       if (toSend) {
-
           ndn::EncodingBuffer buffer(store_packet);
-
           if (buffer.size() <= 0) {
             NFD_LOG_FACE_TRACE("Trying to send a packet with no size");
           }
@@ -137,7 +134,7 @@ void LoRaTransport::transmit_and_recieve()
           // copy the buffer into a cstr so we can send it
           char *cstr = new char[buffer.size() + 1];
           uint8_t *buff = buffer.buf();
-          for (int i = 0; i < buffer.size(); i++) {
+          for (size_t i = 0; i < buffer.size(); i++) {
             cstr[i] = buff[i];
           }
           if ((nfd::face::LoRaTransport::e = sx1272.sendPacketTimeout(0, cstr)) != 0) {
@@ -168,7 +165,7 @@ void LoRaTransport::transmit_and_recieve()
 
 void LoRaTransport::handleRead() {
     bool dataToConsume = true;
-    unsigned int i;
+    size_t i;
     while (dataToConsume) {
       e = sx1272.getPacket();
       if (e == 0) {
@@ -181,7 +178,8 @@ void LoRaTransport::handleRead() {
             // Reset null terminator
             my_packet[i] = '\0';
 
-            NFD_LOG_FACE_TRACE("Received packet: " + my_packet);
+            NFD_LOG_FACE_TRACE("Received packet: ");
+            NFD_LOG_FACE_TRACE(my_packet);
       }
       else {
         handleError("Unable to get packet data: " + std::to_string(e));
