@@ -143,6 +143,22 @@ def configure(conf):
     conf.write_config_header('core/config.hpp')
 
 def build(bld):
+    bld.stlib(
+        source='lora_libs/arduPi/arduPi.cpp',
+        includes='.',
+        target='arduPi') 
+
+    bld.stlib(
+        source='lora_libs/arduPi-api/arduPiUART.cpp lora_libs/arduPi-api/arduPiMultiprotocol.cpp lora_libs/arduPi-api/arduPiUtils.cpp',
+        includes='.',
+        target='arduPiApi') 
+
+    bld.stlib(
+        source='lora_libs/libraries/arduPiLoRa/arduPiLoRa.cpp',
+        target='arduPiLoRa',
+        includes='. lora_libs/arduPi/ lora_libs/arduPi-api/',
+        use=['arduPi', 'arduPiApi']) 
+
     versionhpp(bld)
 
     bld(features='subst',
@@ -162,6 +178,14 @@ def build(bld):
         export_includes='.',
         headers='core/common.hpp')
 
+    bld.objects(
+        target ='lora-face',    
+        source=bld.path.ant_glob('daemon/face/lora-transport.cpp'),
+        use=['core-objects', 'arduPiLoRa'],
+        cxxflags='-lrt -lpthread -lstdc++',
+        includes='daemon lora_libs lora_libs/* . lora_libs/arduPi/ lora_libs/libraries/arduPiLoRa/ lora_libs/arduPi-api/',
+        export_includes='daemon')
+
     nfd_objects = bld.objects(
         target='daemon-objects',
         source=bld.path.ant_glob('daemon/**/*.cpp',
@@ -169,7 +193,7 @@ def build(bld):
                                        'daemon/face/pcap*.cpp',
                                        'daemon/face/unix*.cpp',
                                        'daemon/face/websocket*.cpp',
-                                       'daemon/main.cpp']),
+                                       'daemon/main.cpp', 'daemon/lora-transport.cpp']), # changed this
         use='core-objects',
         includes='daemon',
         export_includes='daemon')
@@ -192,7 +216,7 @@ def build(bld):
     bld.program(name='nfd',
                 target='bin/nfd',
                 source='daemon/main.cpp',
-                use='daemon-objects SYSTEMD')
+                use='daemon-objects SYSTEMD lora-face') # changed this
 
     bld.recurse('tools')
     bld.recurse('tests')
