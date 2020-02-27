@@ -180,7 +180,7 @@ def build(bld):
 
     bld.objects(
         target ='lora-face',    
-        source=bld.path.ant_glob('daemon/face/lora-transport.cpp'),
+        source=bld.path.ant_glob(['daemon/face/lora-transport.cpp', 'daemon/face/lora-channel.cpp']),
         use=['core-objects', 'arduPiLoRa'],
         cxxflags='-lrt -lpthread -lstdc++',
         includes='daemon lora_libs lora_libs/* . lora_libs/arduPi/ lora_libs/libraries/arduPiLoRa/ lora_libs/arduPi-api/',
@@ -193,7 +193,8 @@ def build(bld):
                                        'daemon/face/pcap*.cpp',
                                        'daemon/face/unix*.cpp',
                                        'daemon/face/websocket*.cpp',
-                                       'daemon/main.cpp', 'daemon/lora-transport.cpp']), # changed this
+                                       'daemon/main.cpp',
+                                       'daemon/lora-transport.cpp', 'daemon/lora-channel.cpp']), # changed this
         use='core-objects',
         includes='daemon',
         export_includes='daemon')
