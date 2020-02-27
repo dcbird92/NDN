@@ -40,7 +40,6 @@ LoRaFactory::doCreateFace(const CreateFaceRequest& req,
       i.second->createFace(req.params, onCreated);
       return;
     }
-  }
 
   NFD_LOG_TRACE("No LoRas available to connect to ");
   onFailure(504, "No LoRa available to connect");
@@ -58,7 +57,7 @@ LoRaFactory::createChannel( time::nanoseconds idleTimeout)
   return channel;
 }
 
-std::vector<shared_ptr<const Channel>>
+std::vector<shared_ptr<const LoRaChannel>>
 LoRaFactory::doGetChannels() const
 {
   return getChannelsFromMap(m_channels);
