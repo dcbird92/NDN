@@ -62,7 +62,7 @@ protected:
                     const ethernet::Address& remoteEndpoint);
 
   void
-  doClose() final;
+  doClose();
 
   bool
   hasRecentlyReceived() const
@@ -81,7 +81,7 @@ private:
   handleNetifStateChange(ndn::net::InterfaceState netifState);
 
   void
-  doSend(const Block& packet, const EndpointId& endpoint) final;
+  doSend(const Block& packet, const EndpointId& endpoint);
 
   /**
    * @brief Sends the specified TLV block on the network wrapped in an Ethernet frame

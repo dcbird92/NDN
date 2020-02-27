@@ -30,19 +30,15 @@ LoRaTransport::LoRaTransport() {
     
     rc = pthread_create(&receive, NULL, transmit_and_recieve, NULL);
     if(rc) {
-      handleError("Unable to create initial thread to create receive and transmitting thread: " + rc);
+      handleError("Unable to create initial thread to create receive and transmitting thread: " + std::to_string(rc));
     }
 
     // Wait for the threads to join (user would have to ctrl-c)
     pthread_join(receive, NULL);
 }
 
-LoRaTransport::receivePayload() {
 
-}
-
-
-LoRaTransport::setup() {
+void LoRaTransport::setup() {
   // Print a start message
   
   // Power ON the module
@@ -76,9 +72,9 @@ LoRaTransport::setup() {
   delay(1000);
 }
 
-LoRaTransport::doClose() {
+void LoRaTransport::doClose() {
     // Close this form of transmission by turning off the chip
-    e = sx1272.OFF()
+    e = sx1272.OFF();
     if (e) {
         printf("Unable to turn off LoRa chip, try again: state %d\n", e);
         return;
@@ -87,7 +83,7 @@ LoRaTransport::doClose() {
   this->setState(TransportState::FAILED);
 }
 
-LoRaTransport::doSend(const Block &packet) {
+void LoRaTransport::doSend(const Block &packet) {
   NFD_LOG_FACE_TRACE(__func__);
 
   // Set the flag high that we have a packet to transmit, and grab the data to send
