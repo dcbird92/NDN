@@ -33,22 +33,22 @@
 namespace nfd {
 namespace face {
 
-NFD_LOG_INIT(LoraChannel);
+NFD_LOG_INIT(LoRaChannel);
 
-LoraChannel:LoraChannel(){
+LoRaChannel::LoRaChannel(){
   setUri(FaceUri());
   NFD_LOG_CHAN_INFO("Creating channel");
 }
 
 
 void
-LoraChannel::createFace( const FaceParams& params,
+LoRaChannel::createFace( const FaceParams& params,
                        const FaceCreatedCallback& onFaceCreated)
 {
   shared_ptr<Face> face;
 
   auto linkService = make_unique<GenericLinkService>();
-  auto transport = make_unique<LoraTransport>();
+  auto transport = make_unique<LoRaTransport>();
   face = make_shared<Face>(std::move(linkService), std::move(transport));
 
   m_channelFaces["default"] = face;
@@ -60,7 +60,7 @@ LoraChannel::createFace( const FaceParams& params,
 }
 
 void
-LoraChannel::setup(){
+LoRaChannel::setup(){
   // Print a start message
   printf("SX1272 module and Raspberry Pi: send packets with ACK and retries\n");
 
