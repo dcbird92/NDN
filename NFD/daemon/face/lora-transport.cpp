@@ -8,6 +8,8 @@ namespace nfd {
 
 namespace face {
 
+NFD_LOG_INIT(LoRaTransport);
+
 LoRaTransport::LoRaTransport() {
 
     // Set all of the static variables associated with this transmission 
@@ -30,19 +32,15 @@ LoRaTransport::LoRaTransport() {
     
     rc = pthread_create(&receive, NULL, transmit_and_recieve, NULL);
     if(rc) {
-      handleError("Unable to create initial thread to create receive and transmitting thread: " + rc);
+      handleError("Unable to create initial thread to create receive and transmitting thread: " + std::to_string(rc));
     }
 
     // Wait for the threads to join (user would have to ctrl-c)
     pthread_join(receive, NULL);
 }
 
-LoRaTransport::receivePayload() {
 
-}
-
-
-LoRaTransport::setup() {
+void LoRaTransport::setup() {
   // Print a start message
   
   // Power ON the module
@@ -76,9 +74,9 @@ LoRaTransport::setup() {
   delay(1000);
 }
 
-LoRaTransport::doClose() {
+void LoRaTransport::doClose() {
     // Close this form of transmission by turning off the chip
-    e = sx1272.OFF()
+    e = sx1272.OFF();
     if (e) {
         printf("Unable to turn off LoRa chip, try again: state %d\n", e);
         return;
@@ -87,7 +85,7 @@ LoRaTransport::doClose() {
   this->setState(TransportState::FAILED);
 }
 
-LoRaTransport::doSend(const Block &packet) {
+void LoRaTransport::doSend(const Block &packet, const EndpointId& endpoint) {
   NFD_LOG_FACE_TRACE(__func__);
 
   // Set the flag high that we have a packet to transmit, and grab the data to send
@@ -97,7 +95,7 @@ LoRaTransport::doSend(const Block &packet) {
   pthread_mutex_unlock(nfd::face::LoRaTransport::&threadLock);
 }
 
-LoRaTransport::sendPacket(const ndn::Block &block) {
+void LoRaTransport::sendPacket(const ndn::Block &block) {
   ndn::EncodingBuffer buffer(block);
 
   if (block.size() <= 0) {
@@ -125,7 +123,7 @@ LoRaTransport::sendPacket(const ndn::Block &block) {
 /*
 * Function used for switching from receiving --> transmitting --> receiving for the LoRa
 */
-LoRaTransport::transmit_and_recieve(void *threadid)
+void LoRaTransport::transmit_and_recieve()
 {
 
   NFD_LOG_FACE_TRACE("Starting Lo-Ra thread");
@@ -162,7 +160,7 @@ LoRaTransport::transmit_and_recieve(void *threadid)
       else {
 
           // No need to keep the lock here...
-          pthread_mutex_unlock(nfd::face::LoRaTransport::&threadLock);
+          pthread_mutex_unlock(&threadLock);
 
           // Check to see if the LoRa has received data... if so handle it
           if (sx1272.checkForData()) {
@@ -172,12 +170,12 @@ LoRaTransport::transmit_and_recieve(void *threadid)
   }
 }
 
-LoRaTransport::handleRead() {
+void LoRaTransport::handleRead() {
     bool dataToConsume = true;
     unsigned int i;
     while (dataToConsume) {
-      nfd::face::LoRaTransport::e = sx1272.getPacket();
-      if (nfd::face::LoRaTransport::e == 0) {
+      e = sx1272.getPacket();
+      if (e == 0) {
             uint8_t packetLength = sx1272.getCurrentPacketLength();
             for (i = 0; i < packetLength; i++)
             {
@@ -190,7 +188,7 @@ LoRaTransport::handleRead() {
             NFD_LOG_FACE_TRACE("Received packet: " + my_packet);
       }
       else {
-        handleError("Unable to get packet data: " + nfd::face::LoRaTransport::e)
+        handleError("Unable to get packet data: " + std::to_string(e));
       }
       dataToConsume = sx1272.checkForData();
     }
@@ -206,7 +204,7 @@ LoRaTransport::handleRead() {
     this->receive(element);
 } 
 
-LoRaTransport::handleError(const std::string &errorMessage) {
+void LoRaTransport::handleError(const std::string &errorMessage) {
   if (getPersistency() == ndn::nfd::FACE_PERSISTENCY_PERMANENT) {
     NFD_LOG_FACE_DEBUG("Permanent face ignores error: " << errorMessage);
     return;

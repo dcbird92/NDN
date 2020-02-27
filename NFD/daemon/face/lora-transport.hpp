@@ -8,6 +8,7 @@
 #include <string>
 #include <pthread.h>
 #include <queue>
+#include "pcap-helper.hpp"
 
 // Include the SX1272 and SPI library:
 #include "../../../libraries/arduPiLoRa/arduPiLoRa.h"
@@ -45,7 +46,7 @@ protected:
 
 private:
     void
-    doSend(const Block &packet, const EndpointId &endpoint) final;
+    doSend(const Block &packet, const EndpointId& endpoint) final;
 
     /**
    * @brief Sends the specified TLV block on the network wrapped in an Ethernet frame
@@ -57,7 +58,7 @@ private:
     asyncRead();
 
     void
-    handleRead(const boost::system::error_code &error);
+    handleRead();
 
     void
     handleError(const std::string &errorMessage);
@@ -73,14 +74,12 @@ private:
         bool toSend;
 
         // Creating mutexes for shared queue and conditions for when data is produced from console
-        pthread_mutex_t threadLock = std::PTHREAD_MUTEX_INITIALIZER; 
+        pthread_mutex_t threadLock = PTHREAD_MUTEX_INITIALIZER; 
         
         pthread_cond_t dataSent =  
-                            std::PTHREAD_COND_INITIALIZER; 
+                            PTHREAD_COND_INITIALIZER; 
 
-        // Packet to be sent when doSend is triggered
-        const Block &packet;
-}
+};
 
 } // namespace face
 } // namespace nfd
