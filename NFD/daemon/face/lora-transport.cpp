@@ -8,6 +8,8 @@ namespace nfd {
 
 namespace face {
 
+NFD_LOG_INIT(LoRaTransport);
+
 LoRaTransport::LoRaTransport() {
 
     // Set all of the static variables associated with this transmission 
