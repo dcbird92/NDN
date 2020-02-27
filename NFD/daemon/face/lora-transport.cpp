@@ -75,12 +75,8 @@ void LoRaTransport::setup() {
 }
 
 void LoRaTransport::doClose() {
-    // Close this form of transmission by turning off the chip
-    e = sx1272.OFF();
-    if (e) {
-        printf("Unable to turn off LoRa chip, try again: state %d\n", e);
-        return;
-    }
+  // Close this form of transmission by turning off the chip
+  sx1272.OFF();
 
   this->setState(TransportState::FAILED);
 }
@@ -89,10 +85,10 @@ void LoRaTransport::doSend(const Block &packet, const EndpointId& endpoint) {
   NFD_LOG_FACE_TRACE(__func__);
 
   // Set the flag high that we have a packet to transmit, and grab the data to send
-  pthread_mutex_lock(nfd::face::LoRaTransport::&threadLock);
-  nfd::face::LoRaTransport::packet = packet;
-  nfd::face::LoRaTransport::toSend = true;
-  pthread_mutex_unlock(nfd::face::LoRaTransport::&threadLock);
+  pthread_mutex_lock(&threadLock);
+  store_packet = packet;
+  toSend = true;
+  pthread_mutex_unlock(&threadLock);
 }
 
 void LoRaTransport::sendPacket(const ndn::Block &block) {
@@ -128,11 +124,11 @@ void LoRaTransport::transmit_and_recieve()
 
   NFD_LOG_FACE_TRACE("Starting Lo-Ra thread");
   while(true){
-      pthread_mutex_lock(nfd::face::LoRaTransport::&threadLock);
+      pthread_mutex_lock(&threadLock);
       // Check and see if there is something to send
-      if (nfd::face::LoRaTransport::toSend) {
+      if (toSend) {
 
-          ndn::EncodingBuffer buffer(nfd::face::LoRaTransport::packet);
+          ndn::EncodingBuffer buffer(store_packet);
 
           if (buffer.size() <= 0) {
             NFD_LOG_FACE_TRACE("Trying to send a packet with no size");
@@ -197,7 +193,7 @@ void LoRaTransport::handleRead() {
     Block element;
     std::tie(isOk, element) = Block::fromBuffer(my_packet, i);
     if (!isOk) {
-      NFD_LOG_FACE_WARN("Failed to parse incoming packet from " << sender);
+      NFD_LOG_FACE_WARN("Failed to parse incoming packet");
       // This packet won't extend the face lifetime
       return;
     }

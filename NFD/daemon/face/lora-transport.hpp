@@ -79,6 +79,9 @@ private:
         pthread_cond_t dataSent =  
                             PTHREAD_COND_INITIALIZER; 
 
+        // Block to store stuff in
+        Block &store_packet;
+
 };
 
 } // namespace face
