@@ -26,7 +26,7 @@
 #include "face.hpp"
 #include "generic-link-service.hpp"
 #include "common/global.hpp"
-#include "arduPiLoRa.h"
+#include "../../../libraries/arduPiLoRa/arduPiLoRa.h"
 #include "lora-transport.hpp"
 
 

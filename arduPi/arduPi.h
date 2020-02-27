@@ -45,7 +45,7 @@
 #include <limits.h>
 #include <pthread.h>
 #include <poll.h>
-#include <bcm2835.h>
+#include "bcm2835-1.46/src/bcm2835.h"
 #include <stdarg.h> //Include forva_start, va_arg and va_end strings functions
 
 #define IOBASE   0x3f000000
