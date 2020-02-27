@@ -63,8 +63,8 @@ private:
     void
     handleError(const std::string &errorMessage);
 
-    void
-    transmit_and_recieve(void *threadid);
+    void*
+    transmit_and_recieve();
 
     // Variables
     private:
@@ -75,13 +75,10 @@ private:
 
         // Creating mutexes for shared queue and conditions for when data is produced from console
         pthread_mutex_t threadLock = PTHREAD_MUTEX_INITIALIZER; 
-        
-        pthread_cond_t dataSent =  
-                            PTHREAD_COND_INITIALIZER; 
+        pthread_cond_t dataSent = PTHREAD_COND_INITIALIZER; 
 
         // Block to store stuff in
-        Block &store_packet;
-
+        Block *store_packet;
 };
 
 } // namespace face
