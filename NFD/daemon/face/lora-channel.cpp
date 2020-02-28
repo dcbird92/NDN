@@ -88,10 +88,10 @@ LoRaChannel::setup(){
   // Set the LoRa into receive mode by default
   e = sx1272.receive();
   if (e)
-    NFD_LOG_FACE_TRACE("Unable to enter receive mode");
+    NFD_LOG_CHAN_DEBUG("Unable to enter receive mode");
 
   // Print a success message
-  NFD_LOG_FACE_TRACE("SX1272 successfully configured\n\n");
+  NFD_LOG_CHAN_DEBUG("SX1272 successfully configured\n\n");
   delay(1000);
 }
 
