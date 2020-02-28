@@ -28,8 +28,8 @@ LoRaTransport::LoRaTransport() {
     int rc;
     
     void (LoRaTransport::*transmit_and_recieve)();
-    
-    rc = pthread_create(&receive, NULL, std::bind(&LoRaTransport::transmit_and_recieve, this), NULL);
+
+    rc = pthread_create(&receive, NULL, &LoRaTransport::transmit_and_receive_helper, this);
     if(rc) {
       handleError("Unable to create initial thread to create receive and transmitting thread: " + std::to_string(rc));
     }

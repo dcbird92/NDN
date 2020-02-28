@@ -32,6 +32,15 @@ class LoRaTransport : public Transport
     void
     receivePayload();
 
+    /*
+    * @brief Helper funnction used for passing this along with pthread to spawn a thread. Otherwise compilation errors
+    * https://stackoverflow.com/questions/1151582/pthread-function-from-a-class
+    * */
+    static void *transmit_and_receive_helper(void *context)
+    {
+        return ((LoRaTransport *)context)->transmit_and_recieve();
+    }
+
 protected:
 
     void
