@@ -69,7 +69,7 @@ private:
 
   size_t m_size;
 
-}
+};
 
 } // namespace face
 } // namespace nfd

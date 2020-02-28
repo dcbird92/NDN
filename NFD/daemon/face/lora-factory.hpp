@@ -55,7 +55,7 @@ private:
 
 private:
   bool m_wantCongestionMarking = false;
-  std::map<std::string, shared_ptr<LoRaChannels>> m_channels;
+  std::map<std::string, shared_ptr<LoRaChannel>> m_channels;
 
   signal::ScopedConnection m_netifAddConn;
   struct NetifConns
