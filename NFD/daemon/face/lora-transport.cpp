@@ -4,6 +4,8 @@
 
 #include "lora-transport.hpp"
 
+typedef void * (*THREADFUNCPTR)(void *);
+
 namespace nfd {
 
 namespace face {
@@ -30,7 +32,7 @@ LoRaTransport::LoRaTransport() {
     pthread_t receive;
     int rc;
     
-    rc = pthread_create(&receive, NULL, transmit_and_recieve, NULL);
+    rc = pthread_create(&receive, NULL, (THREADFUNCPTR)&LoRaTransport::transmit_and_recieve, NULL);
     if(rc) {
       handleError("Unable to create initial thread to create receive and transmitting thread: " + std::to_string(rc));
     }
@@ -86,7 +88,7 @@ void LoRaTransport::doSend(const Block &packet, const EndpointId& endpoint) {
 
   // Set the flag high that we have a packet to transmit, and grab the data to send
   pthread_mutex_lock(&threadLock);
-  store_packet = packet;
+  store_packet = &packet;
   toSend = true;
   pthread_mutex_unlock(&threadLock);
 }
@@ -119,7 +121,7 @@ void LoRaTransport::sendPacket(const ndn::Block &block) {
 /*
 * Function used for switching from receiving --> transmitting --> receiving for the LoRa
 */
-void* LoRaTransport::transmit_and_recieve()
+void *LoRaTransport::transmit_and_recieve()
 {
   NFD_LOG_FACE_TRACE("Starting Lo-Ra thread");
   while(true){
