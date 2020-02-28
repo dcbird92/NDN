@@ -28,6 +28,7 @@
 #include "common/global.hpp"
 #include "../../../libraries/arduPiLoRa/arduPiLoRa.h"
 #include "lora-transport.hpp"
+#include "lora-channel.hpp"
 
 
 namespace nfd {
