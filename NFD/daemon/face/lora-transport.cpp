@@ -25,9 +25,6 @@ LoRaTransport::LoRaTransport() {
     // setState(TransportState newState);
     // setExpirationTime(const time::steady_clock::TimePoint& expirationTime);
 
-    // Setup the lora chip
-    setup();
-
     // Create the neccessary thread to begin receving and transmitting
     pthread_t receive;
     int rc;
@@ -39,41 +36,6 @@ LoRaTransport::LoRaTransport() {
 
     // Wait for the threads to join (user would have to ctrl-c)
     pthread_join(receive, NULL);
-}
-
-
-void LoRaTransport::setup() {
-  // Print a start message
-  
-  // Power ON the module
-  e = sx1272.ON();
-  
-  // Set transmission mode
-  e = sx1272.setMode(4);
-  
-  // Set header
-  e = sx1272.setHeaderON();
-  
-  // Select frequency channel
-  e = sx1272.setChannel(CH_10_868);
-  
-  // Set CRC
-  e = sx1272.setCRC_ON();
-  
-  // Select output power (Max, High or Low)
-  e = sx1272.setPower('H');
-  
-  // Set the node address
-  e = sx1272.setNodeAddress(3);
-
-  // Set the LoRa into receive mode by default
-  e = sx1272.receive();
-  if (e)
-    handleError("Unable to enter receive mode");
-  
-  // Print a success message
-  NFD_LOG_FACE_TRACE("SX1272 successfully configured\n\n");
-  delay(1000);
 }
 
 void LoRaTransport::doClose() {
@@ -128,7 +90,7 @@ void *LoRaTransport::transmit_and_recieve()
       pthread_mutex_lock(&threadLock);
       // Check and see if there is something to send
       if (toSend) {
-          ndn::EncodingBuffer buffer(store_packet);
+          ndn::EncodingBuffer buffer(*store_packet);
           if (buffer.size() <= 0) {
             NFD_LOG_FACE_TRACE("Trying to send a packet with no size");
           }
@@ -191,7 +153,10 @@ void LoRaTransport::handleRead() {
 
     bool isOk = false;
     Block element;
-    std::tie(isOk, element) = Block::fromBuffer(my_packet, i);
+
+    // Convert my_packet char [] --> const uint8_t*
+    const uint8_t* buffer_ptr = (uint8_t*)my_packet;
+    std::tie(isOk, element) = Block::fromBuffer(buffer_ptr, i);
     if (!isOk) {
       NFD_LOG_FACE_WARN("Failed to parse incoming packet");
       // This packet won't extend the face lifetime

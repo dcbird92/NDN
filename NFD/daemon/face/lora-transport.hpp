@@ -38,12 +38,6 @@ protected:
     void
     doClose() final;
 
-    /**
-     * @brief Is used to setup the LoRa and set all the correct bits for the LoRa (intialization step)
-     */ 
-    void
-    setup();
-
 private:
     void
     doSend(const Block &packet, const EndpointId& endpoint) final;
