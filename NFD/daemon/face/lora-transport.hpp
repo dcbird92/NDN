@@ -32,8 +32,9 @@ class LoRaTransport : public Transport
     void
     receivePayload();
 
-protected:
     LoRaTransport();
+
+protected:
 
     void
     doClose() final;
