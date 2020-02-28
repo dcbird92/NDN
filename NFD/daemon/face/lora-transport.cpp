@@ -4,8 +4,6 @@
 
 #include "lora-transport.hpp"
 
-typedef void * (*THREADFUNCPTR)(void *);
-
 namespace nfd {
 
 namespace face {
@@ -29,7 +27,9 @@ LoRaTransport::LoRaTransport() {
     pthread_t receive;
     int rc;
     
-    rc = pthread_create(&receive, NULL, (THREADFUNCPTR)&LoRaTransport::transmit_and_recieve, NULL);
+    void (LoRaTransport::*transmit_and_recieve)();
+    
+    rc = pthread_create(&receive, NULL, std::bind(&LoRaTransport::transmit_and_recieve, this), NULL);
     if(rc) {
       handleError("Unable to create initial thread to create receive and transmitting thread: " + std::to_string(rc));
     }
