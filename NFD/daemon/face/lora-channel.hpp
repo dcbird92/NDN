@@ -23,8 +23,10 @@
  * NFD, e.g., in COPYING.md file.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef NFD_DAEMON_FACE_LORA_CHANNEL_HPP
+#define NFD_DAEMON_FACE_LORA_CHANNEL_HPP
 
- #include "channel.hpp"
+#include "channel.hpp"
 
 
  namespace nfd {
@@ -63,13 +65,15 @@ public:
   }
 
 private:
-
   void
   setup();
-
+  std::map<std::string, shared_ptr<Face>> m_channelFaces;
   size_t m_size;
+  int e;
 
 };
 
 } // namespace face
 } // namespace nfd
+
+#endif

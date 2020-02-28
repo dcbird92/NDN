@@ -28,6 +28,7 @@
 #include "common/global.hpp"
 #include "../../../libraries/arduPiLoRa/arduPiLoRa.h"
 #include "lora-transport.hpp"
+#include "lora-channel.hpp"
 
 
 namespace nfd {
@@ -95,7 +96,7 @@ LoRaChannel::setup(){
   // Set the LoRa into receive mode by default
   e = sx1272.receive();
   if (e)
-    cout << "Unable to enter receive mode" << endl;
+    std::cout << "Unable to enter receive mode" << std::endl;
 
   // Print a success message
   printf("SX1272 successfully configured\n\n");
