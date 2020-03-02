@@ -46,7 +46,7 @@ LoRaFactory::doCreateFace(const CreateFaceRequest& req,
 }
 
 shared_ptr<LoRaChannel>
-LoRaFactory::createChannel( time::nanoseconds idleTimeout)
+LoRaFactory::createChannel()
 {
   auto it = m_channels.find("default");
   if (it != m_channels.end())
@@ -57,7 +57,7 @@ LoRaFactory::createChannel( time::nanoseconds idleTimeout)
   return channel;
 }
 
-std::vector<shared_ptr<const LoRaChannel>>
+std::vector<shared_ptr<const Channel>>
 LoRaFactory::doGetChannels() const
 {
   return getChannelsFromMap(m_channels);
