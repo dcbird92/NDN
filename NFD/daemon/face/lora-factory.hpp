@@ -23,6 +23,8 @@ public:
   explicit
   LoRaFactory(const CtorParams& params);
 
+  using ProtocolFactory::ProtocolFactory;
+
   /**
    * \brief Create LoRa-based channel
    *
