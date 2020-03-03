@@ -3,6 +3,10 @@
  * will be used as another medium for NDN transmission
  */
 
+
+#ifndef NFD_DAEMON_FACE_LORA_TRANSPORT_HPP
+#define NFD_DAEMON_FACE_LORA_TRANSPORT_HPP
+
 #include "transport.hpp"
 #include <ndn-cxx/net/network-interface.hpp>
 #include <string>
@@ -89,3 +93,5 @@ public:
 
 } // namespace face
 } // namespace nfd
+
+#endif
