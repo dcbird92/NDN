@@ -194,7 +194,7 @@ def build(bld):
                                        'daemon/face/unix*.cpp',
                                        'daemon/face/websocket*.cpp',
                                        'daemon/main.cpp',
-                                       'daemon/lora-transport.cpp', 'daemon/lora-channel.cpp']), # changed this
+                                       'daemon/face/lora-transport.cpp', 'daemon/face/lora-channel.cpp']), # changed this
         use='core-objects',
         includes='daemon',
         export_includes='daemon')
