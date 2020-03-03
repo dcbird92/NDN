@@ -63,7 +63,7 @@ LoRaChannel::createFace( const FaceParams& params,
 void
 LoRaChannel::setup(){
     // Print a start message
-
+  int e;
   // Power ON the module
   e = sx1272.ON();
 
