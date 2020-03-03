@@ -57,6 +57,11 @@ public:
   createFace( const FaceParams& params,
              const FaceCreatedCallback& onFaceCreated);
 
+  bool
+  isListening() const override
+  {
+    return true;
+  }
 
   size_t
   size() const override
