@@ -119,6 +119,8 @@ FaceSystem::processConfig(const ConfigSection& configSection, bool isDryRun, con
 
   // process in protocol factories
   for (const auto& pair : m_factories) {
+    NFD_LOG_TRACE("first" + pair.first);
+    NFD_LOG_TRACE("second");
     const std::string& sectionName = pair.first;
     ProtocolFactory* factory = pair.second.get();
 
