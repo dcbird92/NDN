@@ -28,6 +28,7 @@ void
 LoRaFactory::doProcessConfig(OptionalConfigSection configSection,
                             FaceSystem::ConfigContext& context)
 {
+    NFD_LOG_TRACE("Lora Process Config");
 }
 
 void
