@@ -121,6 +121,7 @@ FaceSystem::processConfig(const ConfigSection& configSection, bool isDryRun, con
   for (const auto& pair : m_factories) {
     const std::string& sectionName = pair.first;
     ProtocolFactory* factory = pair.second.get();
+    NFD_LOG_TRACE("FACTORY:" + sectionName);
 
     std::set<std::string> oldProvidedSchemes = factory->getProvidedSchemes();
     factory->processConfig(configSection.get_child_optional(sectionName), context);
@@ -150,6 +151,7 @@ FaceSystem::processConfig(const ConfigSection& configSection, bool isDryRun, con
   for (const auto& pair : configSection) {
     const std::string& sectionName = pair.first;
     // const ConfigSection& subSection = pair.second;
+      NFD_LOG_TRACE("OTHER:" + sectionName);
 
     if (!seenSections.insert(sectionName).second) {
       NDN_THROW(ConfigFile::Error("Duplicate section " + CFGSEC_FACESYSTEM + "." + sectionName));
