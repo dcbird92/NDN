@@ -100,6 +100,12 @@ face_system
     path /var/run/nfd.sock ; Unix stream listener path
   }
 
+  ; Lora!
+  lora
+  {
+
+  }
+
   ; The tcp section contains settings for TCP faces and channels.
   tcp
   {
@@ -120,11 +126,6 @@ face_system
       {
       }
     }
-  }
-
-  lora
-  {
-    
   }
 
   ; The udp section contains settings for UDP faces and channels.
