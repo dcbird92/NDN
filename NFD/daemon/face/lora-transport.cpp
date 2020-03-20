@@ -26,8 +26,10 @@ LoRaTransport::LoRaTransport() {
     // Create the neccessary thread to begin receving and transmitting
     pthread_t receive;
     int rc;
-    
+
     void (LoRaTransport::*transmit_and_recieve)();
+
+    NFD_LOG_WARN("Creating channel");
 
     rc = pthread_create(&receive, NULL, &LoRaTransport::transmit_and_receive_helper, this);
     if(rc) {
