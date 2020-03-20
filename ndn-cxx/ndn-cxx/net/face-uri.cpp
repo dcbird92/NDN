@@ -49,7 +49,11 @@ FaceUri::FaceUri()
 
 FaceUri::FaceUri(const std::string& uri)
 {
-  if (!parse(uri)) {
+  if (uri.compare("lora")) {
+    m_host = uri;
+    m_scheme = "dev";
+  }
+  else if (!parse(uri)) {
     NDN_THROW(Error("Malformed URI: " + uri));
   }
 }
