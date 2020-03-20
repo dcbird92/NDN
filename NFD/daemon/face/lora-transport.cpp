@@ -14,11 +14,11 @@ LoRaTransport::LoRaTransport() {
 
     // Set all of the static variables associated with this transmission 
     // ** COME BACK TO THIS? **
-    // setLocalUri(const FaceUri& uri);
-    // setRemoteUri(const FaceUri& uri);
+    this->setLocalUri(FaceUri("lora"));
+    this->setRemoteUri(FaceUri("lora-remote"));
     // setScope(ndn::nfd::FaceScope scope);
-    // setLinkType(ndn::nfd::LinkType linkType);
-    // setMtu(ssize_t mtu);
+    // setLinkType(linkType);
+    this->setMtu(250);
     // setSendQueueCapacity(ssize_t sendQueueCapacity);
     // setState(TransportState newState);
     // setExpirationTime(const time::steady_clock::TimePoint& expirationTime);
