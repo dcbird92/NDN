@@ -28,7 +28,7 @@ void
 LoRaFactory::doProcessConfig(OptionalConfigSection configSection,
                             FaceSystem::ConfigContext& context)
 {
-    createChannel();
+    this->createChannel();
     providedSchemes.insert("dev");
     NFD_LOG_TRACE("Lora Process Config");
 }
