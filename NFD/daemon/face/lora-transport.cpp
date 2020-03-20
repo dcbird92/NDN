@@ -29,6 +29,8 @@ LoRaTransport::LoRaTransport() {
 
     void (LoRaTransport::*transmit_and_recieve)();
 
+    NFD_LOG_WARN("Creating channel");
+
     rc = pthread_create(&receive, NULL, &LoRaTransport::transmit_and_receive_helper, this);
     if(rc) {
       handleError("Unable to create initial thread to create receive and transmitting thread: " + std::to_string(rc));
