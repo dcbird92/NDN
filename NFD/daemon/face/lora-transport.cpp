@@ -14,8 +14,8 @@ LoRaTransport::LoRaTransport() {
 
     // Set all of the static variables associated with this transmission 
     // ** COME BACK TO THIS? **
-    this->setLocalUri(FaceUri());
-    this->setRemoteUri(FaceUri());
+    this->setLocalUri(FaceUri("lora"));
+    this->setRemoteUri(FaceUri("lora-remote"));
     // setScope(ndn::nfd::FaceScope scope);
     // setLinkType(linkType);
     this->setMtu(250);
