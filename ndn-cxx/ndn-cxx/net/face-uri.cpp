@@ -667,14 +667,6 @@ FaceUri::canonize(const CanonizeSuccessCallback& onSuccess,
     BOOST_ASSERT(!providerTable.empty());
   }
 
-  static std::string retString;
-  for (auto const& x : providerTable)
-  {
-      retString += x.first + "\n";
-  }
-
-  onFailure(retString);
-
   const CanonizeProvider* cp = getCanonizeProvider(this->getScheme());
   if (cp == nullptr) {
     if (onFailure) {
