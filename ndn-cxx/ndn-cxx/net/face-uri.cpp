@@ -671,7 +671,7 @@ FaceUri::canonize(const CanonizeSuccessCallback& onSuccess,
   const CanonizeProvider* cp = getCanonizeProvider(this->getScheme());
   if (cp == nullptr) {
     if (onFailure) {
-      onFailure("scheme not supported");
+      onFailure(this->getScheme() + " scheme not supported");
     }
     return;
   }
