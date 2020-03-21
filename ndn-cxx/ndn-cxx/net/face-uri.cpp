@@ -175,6 +175,15 @@ FaceUri::fromDev(const std::string& ifname)
 }
 
 FaceUri
+FaceUri::fromLoRa()
+{
+  FaceUri uri;
+  uri.m_scheme = "lora";
+  uri.m_host = "lora";
+  return uri;
+}
+
+FaceUri
 FaceUri::fromUdpDev(const boost::asio::ip::udp::endpoint& endpoint, const std::string& ifname)
 {
   FaceUri uri;
@@ -560,11 +569,40 @@ public:
   }
 };
 
+
+class LoRaCanonizeProvider : public CanonizeProvider
+{
+public:
+  std::set<std::string>
+  getSchemes() const override
+  {
+    return {"lora"};
+  }
+
+  bool
+  isCanonical(const FaceUri& faceUri) const override
+  {
+    return true;
+  }
+
+  void
+  canonize(const FaceUri& faceUri,
+           const FaceUri::CanonizeSuccessCallback& onSuccess,
+           const FaceUri::CanonizeFailureCallback& onFailure,
+           boost::asio::io_service& io, time::nanoseconds timeout) const override
+  {
+    // No need to check anything, since LoRa doesn't need a host right now. Just for broadcasting purposes only
+    FaceUri canonicalUri = FaceUri::fromDev(faceUri.getHost());
+    onSuccess(canonicalUri);
+  }
+};
+
 using CanonizeProviders = boost::mpl::vector<UdpCanonizeProvider*,
                                              TcpCanonizeProvider*,
                                              EtherCanonizeProvider*,
                                              DevCanonizeProvider*,
-                                             UdpDevCanonizeProvider*>;
+                                             UdpDevCanonizeProvider*,
+                                             LoRaCanonizeProvider*>;
 using CanonizeProviderTable = std::map<std::string, shared_ptr<CanonizeProvider>>;
 
 class CanonizeProviderTableInitializer
