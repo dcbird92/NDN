@@ -592,7 +592,7 @@ public:
            boost::asio::io_service& io, time::nanoseconds timeout) const override
   {
     // No need to check anything, since LoRa doesn't need a host right now. Just for broadcasting purposes only
-    FaceUri canonicalUri = FaceUri::fromDev(faceUri.getHost());
+    FaceUri canonicalUri = FaceUri::fromLoRa();
     onSuccess(canonicalUri);
   }
 };
