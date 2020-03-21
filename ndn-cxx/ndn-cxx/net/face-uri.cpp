@@ -673,7 +673,6 @@ FaceUri::canonize(const CanonizeSuccessCallback& onSuccess,
       retString += x.first + "\n";
   }
 
-  onFailure("bad");
   onFailure(retString);
 
   const CanonizeProvider* cp = getCanonizeProvider(this->getScheme());
