@@ -616,7 +616,6 @@ public:
 
     for (const auto& scheme : schemes) {
       BOOST_ASSERT(m_providerTable.count(scheme) == 0);
-      BOOST_ASSERT(!scheme.find("lora"));
       m_providerTable[scheme] = cp;
     }
   }
@@ -630,6 +629,7 @@ getCanonizeProvider(const std::string& scheme)
 {
   static CanonizeProviderTable providerTable;
   if (providerTable.empty()) {
+    BOOST_ASSERT(CanonizeProviders.size() > 7);
     boost::mpl::for_each<CanonizeProviders>(CanonizeProviderTableInitializer(providerTable));
     BOOST_ASSERT(!providerTable.empty());
   }
