@@ -616,6 +616,7 @@ public:
 
     for (const auto& scheme : schemes) {
       BOOST_ASSERT(m_providerTable.count(scheme) == 0);
+      BOOST_ASSERT(!scheme.find("lora"));
       m_providerTable[scheme] = cp;
     }
   }
