@@ -99,7 +99,7 @@ ProtocolFactory::doCreateFace(const CreateFaceRequest&,
                               const FaceCreatedCallback&,
                               const FaceCreationFailedCallback& onFailure)
 {
-  onFailure(406, "Unsupported protocol");
+  onFailure(406, "Unsupported protocol protocol factory");
 }
 
 shared_ptr<Face>
