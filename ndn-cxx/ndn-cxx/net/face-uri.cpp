@@ -629,7 +629,6 @@ getCanonizeProvider(const std::string& scheme)
 {
   static CanonizeProviderTable providerTable;
   if (providerTable.empty()) {
-    BOOST_ASSERT(CanonizeProviders.size() > 7);
     boost::mpl::for_each<CanonizeProviders>(CanonizeProviderTableInitializer(providerTable));
     BOOST_ASSERT(!providerTable.empty());
   }
@@ -661,6 +660,21 @@ FaceUri::canonize(const CanonizeSuccessCallback& onSuccess,
                   const CanonizeFailureCallback& onFailure,
                   boost::asio::io_service& io, time::nanoseconds timeout) const
 {
+
+  static CanonizeProviderTable providerTable;
+  if (providerTable.empty()) {
+    boost::mpl::for_each<CanonizeProviders>(CanonizeProviderTableInitializer(providerTable));
+    BOOST_ASSERT(!providerTable.empty());
+  }
+
+  static std::string retString;
+  for (auto const& x : providerTable)
+  {
+      retString += x.first + "\n";
+  }
+
+  onFailure(retString);
+
   const CanonizeProvider* cp = getCanonizeProvider(this->getScheme());
   if (cp == nullptr) {
     if (onFailure) {
