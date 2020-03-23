@@ -50,6 +50,8 @@ LoRaChannel::createFace( const FaceParams& params,
 
   NFD_LOG_ERROR("1");
 
+  setup();
+
   auto linkService = make_unique<GenericLinkService>();
 
   NFD_LOG_ERROR("2");
@@ -66,7 +68,6 @@ LoRaChannel::createFace( const FaceParams& params,
 
   NFD_LOG_ERROR("Setup");
 
-  setup();
 
   NFD_LOG_ERROR("Done");
 
