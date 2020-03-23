@@ -47,7 +47,7 @@ LoRaChannel::createFace( const FaceParams& params,
                        const FaceCreatedCallback& onFaceCreated)
 {
   shared_ptr<Face> face;
-
+  NFD_LOG_ERROR("Creating face!");
   auto linkService = make_unique<GenericLinkService>();
   auto transport = make_unique<LoRaTransport>();
   face = make_shared<Face>(std::move(linkService), std::move(transport));

@@ -126,7 +126,6 @@ FaceManager::createFace(const ControlParameters& parameters,
   if (parameters.hasFlagBit(ndn::nfd::BIT_CONGESTION_MARKING_ENABLED)) {
     faceParams.wantCongestionMarking = parameters.getFlagBit(ndn::nfd::BIT_CONGESTION_MARKING_ENABLED);
   }
-  NFD_LOG_ERROR("Trying to create face");
   try {
     factory->createFace({remoteUri, localUri, faceParams},
                         [this, parameters, done] (const auto& face) {
