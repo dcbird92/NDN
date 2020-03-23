@@ -110,8 +110,11 @@ void *LoRaTransport::transmit_and_recieve()
               NFD_LOG_ERROR("Send operation failed: " + std::to_string(e));
           }  
           else
+          {
             // print block size because we don't want to count the padding in buffer
             NFD_LOG_INFO("Successfully sent: " << buffer.size() << " bytes");
+            toSend = false;
+          }
 
           // After sending enter recieve mode again
           sx1272.receive();
