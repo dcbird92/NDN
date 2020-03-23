@@ -12,13 +12,25 @@ NFD_LOG_INIT(LoRaTransport);
 
 LoRaTransport::LoRaTransport() {
 
+
+    NFD_LOG_ERROR("7");
+
     // Set all of the static variables associated with this transmission 
     // ** COME BACK TO THIS? **
     this->setLocalUri(FaceUri("lora"));
+
+    NFD_LOG_ERROR("8");
+
     this->setRemoteUri(FaceUri("lora-remote"));
+
+    NFD_LOG_ERROR("9");
+
     // setScope(ndn::nfd::FaceScope scope);
     // setLinkType(linkType);
     this->setMtu(250);
+
+    NFD_LOG_ERROR("10");
+
     // setSendQueueCapacity(ssize_t sendQueueCapacity);
     // setState(TransportState newState);
     // setExpirationTime(const time::steady_clock::TimePoint& expirationTime);
@@ -28,6 +40,8 @@ LoRaTransport::LoRaTransport() {
     int rc;
 
     void (LoRaTransport::*transmit_and_recieve)();
+
+    NFD_LOG_ERROR("11");
 
     NFD_LOG_WARN("Creating channel");
 
