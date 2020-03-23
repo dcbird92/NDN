@@ -127,6 +127,7 @@ FaceSystem::processConfig(const ConfigSection& configSection, bool isDryRun, con
     factory->processConfig(configSection.get_child_optional(sectionName), context);
 
     if (!isDryRun) {
+      NFD_LOG_TRACE("not dry run");
       for (const std::string& scheme : factory->getProvidedSchemes()) {
         m_factoryByScheme[scheme] = factory;
         if (oldProvidedSchemes.erase(scheme) == 0) {
