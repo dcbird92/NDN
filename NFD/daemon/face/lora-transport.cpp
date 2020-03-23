@@ -94,6 +94,7 @@ void *LoRaTransport::transmit_and_recieve()
       if (toSend) {
           NFD_LOG_ERROR("toSend is true");
           ndn::EncodingBuffer buffer(*store_packet);
+          NFD_LOG_ERROR("toSend after allocate buffer");
           if (buffer.size() <= 0) {
 
             NFD_LOG_ERROR("Trying to send a packet with no size");
