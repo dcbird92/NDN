@@ -122,15 +122,11 @@ FaceSystem::processConfig(const ConfigSection& configSection, bool isDryRun, con
     const std::string& sectionName = pair.first;
     ProtocolFactory* factory = pair.second.get();
     NFD_LOG_TRACE("FACTORY:" + sectionName);
-    if (factory == nullptr) {
-      NFD_LOG_TRACE("NULL FACTORY");
-    }
 
     std::set<std::string> oldProvidedSchemes = factory->getProvidedSchemes();
     factory->processConfig(configSection.get_child_optional(sectionName), context);
-
+    NFD_LOG_TRACE(sectionName + " has " + std::to_string(oldProvidedSchemes.size()));
     if (!isDryRun) {
-      NFD_LOG_TRACE("not dry run for " + sectionName);
       for (const std::string& scheme : factory->getProvidedSchemes()) {
         m_factoryByScheme[scheme] = factory;
         if (oldProvidedSchemes.erase(scheme) == 0) {
