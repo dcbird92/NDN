@@ -47,29 +47,11 @@ LoRaChannel::createFace( const FaceParams& params,
                        const FaceCreatedCallback& onFaceCreated)
 {
   shared_ptr<Face> face;
-
-  NFD_LOG_ERROR("1");
-
   setup();
-
   auto linkService = make_unique<GenericLinkService>();
-
-  NFD_LOG_ERROR("2");
-
   auto transport = make_unique<LoRaTransport>();
-
-  NFD_LOG_ERROR("3");
-
   face = make_shared<Face>(std::move(linkService), std::move(transport));
-
-  NFD_LOG_ERROR("4");
-
   m_channelFaces["default"] = face;
-
-  NFD_LOG_ERROR("Setup");
-
-
-  NFD_LOG_ERROR("Done");
 
   // Need to invoke the callback regardless of whether or not we have already created
   // the face so that control responses and such can be sent.
