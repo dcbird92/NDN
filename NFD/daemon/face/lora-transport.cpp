@@ -14,11 +14,14 @@ LoRaTransport::LoRaTransport() {
 
     // Set all of the static variables associated with this transmission 
     // ** COME BACK TO THIS? **
-    this->setLocalUri(FaceUri("lora"));
-    this->setRemoteUri(FaceUri("lora-remote"));
+    // this->setLocalUri(FaceUri("lora"));
+
+    // this->setRemoteUri(FaceUri("lora-remote"));
+
     // setScope(ndn::nfd::FaceScope scope);
     // setLinkType(linkType);
     this->setMtu(250);
+
     // setSendQueueCapacity(ssize_t sendQueueCapacity);
     // setState(TransportState newState);
     // setExpirationTime(const time::steady_clock::TimePoint& expirationTime);
@@ -26,16 +29,13 @@ LoRaTransport::LoRaTransport() {
     // Create the neccessary thread to begin receving and transmitting
     pthread_t receive;
     int rc;
-    
+
     void (LoRaTransport::*transmit_and_recieve)();
 
     rc = pthread_create(&receive, NULL, &LoRaTransport::transmit_and_receive_helper, this);
     if(rc) {
-      handleError("Unable to create initial thread to create receive and transmitting thread: " + std::to_string(rc));
+      NFD_LOG_ERROR("Unable to create initial thread to create receive and transmitting thread: " + std::to_string(rc));
     }
-
-    // Wait for the threads to join (user would have to ctrl-c)
-    pthread_join(receive, NULL);
 }
 
 void LoRaTransport::doClose() {
@@ -87,7 +87,7 @@ void LoRaTransport::sendPacket(const ndn::Block &block) {
 */
 void *LoRaTransport::transmit_and_recieve()
 {
-  NFD_LOG_FACE_TRACE("Starting Lo-Ra thread");
+  NFD_LOG_INFO("Starting Lo-Ra thread");
   while(true){
       pthread_mutex_lock(&threadLock);
       // Check and see if there is something to send
@@ -95,7 +95,8 @@ void *LoRaTransport::transmit_and_recieve()
           NFD_LOG_ERROR("toSend is true");
           ndn::EncodingBuffer buffer(*store_packet);
           if (buffer.size() <= 0) {
-          NFD_LOG_FACE_TRACE("Trying to send a packet with no size");
+
+            NFD_LOG_ERROR("Trying to send a packet with no size");
           }
 
           // copy the buffer into a cstr so we can send it
@@ -105,11 +106,11 @@ void *LoRaTransport::transmit_and_recieve()
             cstr[i] = buff[i];
           }
           if ((nfd::face::LoRaTransport::e = sx1272.sendPacketTimeout(0, cstr)) != 0) {
-              handleError("Send operation failed: " + std::to_string(e));
+              NFD_LOG_ERROR("Send operation failed: " + std::to_string(e));
           }  
           else
             // print block size because we don't want to count the padding in buffer
-            NFD_LOG_FACE_TRACE("Successfully sent: " << buffer.size() << " bytes");
+            NFD_LOG_INFO("Successfully sent: " << buffer.size() << " bytes");
 
           // After sending enter recieve mode again
           sx1272.receive();
@@ -145,11 +146,11 @@ void LoRaTransport::handleRead() {
             // Reset null terminator
             my_packet[i] = '\0';
 
-            NFD_LOG_FACE_TRACE("Received packet: ");
-            NFD_LOG_FACE_TRACE(my_packet);
+            NFD_LOG_INFO("Received packet: ");
+            NFD_LOG_INFO(my_packet);
       }
       else {
-        handleError("Unable to get packet data: " + std::to_string(e));
+        NFD_LOG_ERROR("Unable to get packet data: " + std::to_string(e));
       }
       dataToConsume = sx1272.checkForData();
     }
@@ -161,7 +162,7 @@ void LoRaTransport::handleRead() {
     const uint8_t* buffer_ptr = (uint8_t*)my_packet;
     std::tie(isOk, element) = Block::fromBuffer(buffer_ptr, i);
     if (!isOk) {
-      NFD_LOG_FACE_WARN("Failed to parse incoming packet");
+      NFD_LOG_ERROR("Failed to parse incoming packet");
       // This packet won't extend the face lifetime
       return;
     }
@@ -170,7 +171,7 @@ void LoRaTransport::handleRead() {
 
 void LoRaTransport::handleError(const std::string &errorMessage) {
   if (getPersistency() == ndn::nfd::FACE_PERSISTENCY_PERMANENT) {
-    NFD_LOG_FACE_DEBUG("Permanent face ignores error: " << errorMessage);
+    NFD_LOG_ERROR("Permanent face ignores error: " << errorMessage);
     return;
   }
 

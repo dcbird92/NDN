@@ -125,7 +125,7 @@ FaceSystem::processConfig(const ConfigSection& configSection, bool isDryRun, con
 
     std::set<std::string> oldProvidedSchemes = factory->getProvidedSchemes();
     factory->processConfig(configSection.get_child_optional(sectionName), context);
-
+    NFD_LOG_TRACE(sectionName + " has " + std::to_string(oldProvidedSchemes.size()));
     if (!isDryRun) {
       for (const std::string& scheme : factory->getProvidedSchemes()) {
         m_factoryByScheme[scheme] = factory;

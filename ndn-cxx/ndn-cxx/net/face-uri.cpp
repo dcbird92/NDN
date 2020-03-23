@@ -169,7 +169,7 @@ FaceUri
 FaceUri::fromDev(const std::string& ifname)
 {
   FaceUri uri;
-  uri.m_scheme = "dev";
+  uri.m_scheme = "lora";
   uri.m_host = ifname;
   return uri;
 }
@@ -560,11 +560,41 @@ public:
   }
 };
 
+
+class LoRaCanonizeProvider : public CanonizeProvider
+{
+public:
+  std::set<std::string>
+  getSchemes() const override
+  {
+    return {"lora"};
+  }
+
+  bool
+  isCanonical(const FaceUri& faceUri) const override
+  {
+    return true;
+  }
+
+  void
+  canonize(const FaceUri& faceUri,
+           const FaceUri::CanonizeSuccessCallback& onSuccess,
+           const FaceUri::CanonizeFailureCallback& onFailure,
+           boost::asio::io_service& io, time::nanoseconds timeout) const override
+  {
+    // No need to check anything, since LoRa doesn't need a host right now. Just for broadcasting purposes only
+    FaceUri canonicalUri = FaceUri::fromDev(faceUri.getHost());
+    BOOST_ASSERT(canonicalUri.isCanonical());
+    onSuccess(canonicalUri);
+  }
+};
+
 using CanonizeProviders = boost::mpl::vector<UdpCanonizeProvider*,
                                              TcpCanonizeProvider*,
                                              EtherCanonizeProvider*,
                                              DevCanonizeProvider*,
-                                             UdpDevCanonizeProvider*>;
+                                             UdpDevCanonizeProvider*,
+                                             LoRaCanonizeProvider*>;
 using CanonizeProviderTable = std::map<std::string, shared_ptr<CanonizeProvider>>;
 
 class CanonizeProviderTableInitializer
@@ -630,10 +660,17 @@ FaceUri::canonize(const CanonizeSuccessCallback& onSuccess,
                   const CanonizeFailureCallback& onFailure,
                   boost::asio::io_service& io, time::nanoseconds timeout) const
 {
+
+  static CanonizeProviderTable providerTable;
+  if (providerTable.empty()) {
+    boost::mpl::for_each<CanonizeProviders>(CanonizeProviderTableInitializer(providerTable));
+    BOOST_ASSERT(!providerTable.empty());
+  }
+
   const CanonizeProvider* cp = getCanonizeProvider(this->getScheme());
   if (cp == nullptr) {
     if (onFailure) {
-      onFailure("scheme not supported");
+      onFailure(this->getScheme() + " scheme not supported");
     }
     return;
   }

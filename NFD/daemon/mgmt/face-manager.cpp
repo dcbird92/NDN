@@ -104,7 +104,7 @@ FaceManager::createFace(const ControlParameters& parameters,
   face::ProtocolFactory* factory = m_faceSystem.getFactoryByScheme(remoteUri.getScheme());
   if (factory == nullptr) {
     NFD_LOG_TRACE("received create request for unsupported protocol: " << remoteUri.getScheme());
-    done(ControlResponse(406, "Unsupported protocol"));
+    done(ControlResponse(406, "Unsupported protocol face manager" + remoteUri.getScheme()));
     return;
   }
 
