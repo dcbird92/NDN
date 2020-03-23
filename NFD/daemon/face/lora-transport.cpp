@@ -17,11 +17,11 @@ LoRaTransport::LoRaTransport() {
 
     // Set all of the static variables associated with this transmission 
     // ** COME BACK TO THIS? **
-    this->setLocalUri(FaceUri("lora"));
+    // this->setLocalUri(FaceUri("lora"));
 
     NFD_LOG_ERROR("8");
 
-    this->setRemoteUri(FaceUri("lora-remote"));
+    // this->setRemoteUri(FaceUri("lora-remote"));
 
     NFD_LOG_ERROR("9");
 
