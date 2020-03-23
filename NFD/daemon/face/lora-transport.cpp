@@ -53,6 +53,8 @@ void LoRaTransport::doSend(const Block &packet, const EndpointId& endpoint) {
   store_packet = &packet;
   toSend = true;
   pthread_mutex_unlock(&threadLock);
+  NFD_LOG_ERROR(__func__);
+  NFD_LOG_ERROR("2");
 }
 
 void LoRaTransport::sendPacket(const ndn::Block &block) {
@@ -90,9 +92,10 @@ void *LoRaTransport::transmit_and_recieve()
       pthread_mutex_lock(&threadLock);
       // Check and see if there is something to send
       if (toSend) {
+          NFD_LOG_ERROR("toSend is true");
           ndn::EncodingBuffer buffer(*store_packet);
           if (buffer.size() <= 0) {
-            NFD_LOG_FACE_TRACE("Trying to send a packet with no size");
+          NFD_LOG_FACE_TRACE("Trying to send a packet with no size");
           }
 
           // copy the buffer into a cstr so we can send it
