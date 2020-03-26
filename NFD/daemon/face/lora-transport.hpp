@@ -15,7 +15,7 @@
 #include "pcap-helper.hpp"
 
 // Include the SX1272 and SPI library:
-#include "../../../libraries/arduPiLoRa/arduPiLoRa.h"
+#include "../../lora_libs/libraries/arduPiLoRa/arduPiLoRa.h"
 
 namespace nfd
 {
