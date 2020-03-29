@@ -102,7 +102,7 @@ void *LoRaTransport::transmit_and_recieve()
             NFD_LOG_ERROR("Trying to send a packet with no size");
           }
 
-          int bufSize = (*store_packet).size();
+          int bufSize = store_packet->size();
 
           // copy the buffer into a cstr so we can send it
           // char *cstr = new char[buffer.size() + 1];
@@ -112,7 +112,7 @@ void *LoRaTransport::transmit_and_recieve()
           // }
           char *cstr = new char[bufSize];
           int i = 0;
-          for(auto ptr = *store_packet.begin(); ptr < *store_packet.end(); ptr++)
+          for(auto ptr = store_packet->begin(); ptr < store_packet->end(); ptr++)
           {
             cstr[i++] = *ptr;
           }
