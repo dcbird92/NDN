@@ -121,7 +121,7 @@ void *LoRaTransport::transmit_and_recieve()
               sentStuff += to_string((int)cstr[idx]);
             }
 
-            NFD_LOG_FACE_INFO("Successfully sent message: " << std::string(cstr));
+            NFD_LOG_FACE_INFO("Successfully sent message: " << sendStuff);
             toSend = false;
           }
 
