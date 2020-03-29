@@ -151,19 +151,19 @@ void LoRaTransport::handleRead() {
       e = sx1272.getPacket();
       if (e == 0) {
         NFD_LOG_ERROR("Data available to receive");
-        uint8_t packetLength = sx1272.getPayloadLength();
+        int packetLength = (int)sx1272.packet_received.length;
         for (i = 0; i < packetLength; i++)
         {
             my_packet[i] = (char)sx1272.packet_received.data[i];
+            if(!my_packet[i])
+              break;
         }
 
         // Reset null terminator
         my_packet[i] = '\0';
-
-        NFD_LOG_INFO("Received packet: ");
-        NFD_LOG_INFO(my_packet);
-        NFD_LOG_INFO("With length: " << (int)packetLength);
-        NFD_LOG_INFO(packetLength);
+        packetLength = i;
+        NFD_LOG_INFO("Received packet:" << my_packet);
+        NFD_LOG_INFO("With length:" << (int)packetLength);
       }
       else {
         NFD_LOG_ERROR("Unable to get packet data: " + std::to_string(e));
@@ -172,22 +172,27 @@ void LoRaTransport::handleRead() {
     }
 
     NDN_LOG_ERROR("i:" + std::to_string(i) + "\n");
-    NDN_LOG_ERROR("packet:");
-    NDN_LOG_ERROR(my_packet);
-    NDN_LOG_ERROR("\n");
-    NFD_LOG_INFO("Packet ascii:");
+    NDN_LOG_ERROR("Full packet:" << my_packet);
     auto gotStuff = std::string();
     int idx = 0;
     while(my_packet[idx])
     {
       gotStuff += to_string((int)my_packet[idx++]);
     }
-    NFD_LOG_ERROR(gotStuff);
+    NFD_LOG_INFO("Packet ascii:" << gotStuff);
     // for (int j = 0; j < i; j++) {
     //   NDN_LOG_ERROR(my_packet[j]);
     // }
 
-    ndn::Block element = ndn::Block((uint8_t*)my_packet, i);
+    try
+    {
+      ndn::Block element = ndn::Block((uint8_t*)my_packet, i);
+    }
+    catch(const std::exception& e)
+    {
+      NFD_LOG_ERROR("Block create exception: " << e.what());
+    }
+    
 
     this->receive(element);
 } 
