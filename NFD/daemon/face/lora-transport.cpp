@@ -88,7 +88,7 @@ void LoRaTransport::sendPacket(const ndn::Block &block) {
 
   // After sending enter recieve mode again
   sx1272.receive();
-  delete(cstr);
+  delete[] cstr;
 }
 
 /*
