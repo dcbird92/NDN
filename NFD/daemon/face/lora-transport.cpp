@@ -3,7 +3,7 @@
  */
 
 #include "lora-transport.hpp"
-
+#include <stdlib.h>
 namespace nfd {
 
 namespace face {
@@ -117,7 +117,7 @@ void *LoRaTransport::transmit_and_recieve()
             // print block size because we don't want to count the padding in buffer
             NFD_LOG_INFO("Successfully sent: " << buffer.size() << " bytes");
 
-            for(int idx = 0; idx < buffer.size(); i++)
+            for(int idx = 0; idx < buffer.size(); idx++)
             {
               cstr[idx] = *itoa((int)cstr[idx]);
             }
