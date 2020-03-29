@@ -58,23 +58,21 @@ void LoRaTransport::doSend(const Block &packet, const EndpointId& endpoint) {
 }
 
 void LoRaTransport::sendPacket(const ndn::Block &block) {
-  // ndn::EncodingBuffer buffer(block);
+  ndn::EncodingBuffer buffer(block);
 
   if (block.size() <= 0) {
     NFD_LOG_FACE_ERROR("Trying to send a packet with no size");
   }
-  NFD_LOG_FACE_TRACE("LoRaTransport::sendPacket");
+
   // copy the buffer into a cstr so we can send it
-  char *cstr = new char[ndn::MAX_NDN_PACKET_SIZE];
-  int i = 0;
-  for(auto ptr = block.begin(); ptr < block.end(); ptr++)
-  {
-    cstr[i++] = *ptr;
+  char *cstr = new char[buffer.size() + 1];
+  uint8_t *buff = buffer.buf();
+  for (size_t i = 0; i < buffer.size(); i++) {
+    cstr[i] = buff[i];
   }
-  cstr[i] = '\0';
   if ((e = sx1272.sendPacketTimeout(0, cstr)) != 0) {
       handleError("Send operation failed: " + std::to_string(e));
-  }
+  }  
   else
   {
     // print block size because we don't want to count the padding in buffer
