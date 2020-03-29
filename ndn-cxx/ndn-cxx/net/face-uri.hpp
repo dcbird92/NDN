@@ -99,6 +99,10 @@ public: // scheme-specific construction
   static FaceUri
   fromDev(const std::string& ifname);
 
+  /// create dev FaceUri for LoRa device
+  static FaceUri
+  fromLora();
+
   /// create udp4 or udp6 NIC-associated FaceUri from endpoint and network device name
   static FaceUri
   fromUdpDev(const boost::asio::ip::udp::endpoint& endpoint, const std::string& ifname);
