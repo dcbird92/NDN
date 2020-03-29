@@ -187,15 +187,14 @@ void LoRaTransport::handleRead() {
     try
     {
       ndn::Block element = ndn::Block((uint8_t*)my_packet, i);
+      this->receive(element);
     }
     catch(const std::exception& e)
     {
       NFD_LOG_ERROR("Block create exception: " << e.what());
     }
-    
-
-    this->receive(element);
 } 
+
 
 void LoRaTransport::handleError(const std::string &errorMessage) {
   if (getPersistency() == ndn::nfd::FACE_PERSISTENCY_PERMANENT) {
