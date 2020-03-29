@@ -95,33 +95,33 @@ void *LoRaTransport::transmit_and_recieve()
       // Check and see if there is something to send
       if (toSend) {
           NFD_LOG_ERROR("toSend is true");
-          // ndn::EncodingBuffer buffer(*store_packet);
-          int bufSize = store_packet->size();
+          ndn::EncodingBuffer buffer(*store_packet);
+          int bufSize = buffer.size();
           NFD_LOG_ERROR("toSend after allocate bufferr");
-          // if (buffer.size() <= 0) 
-          //   NFD_LOG_ERROR("Trying to send a packet with no size");
-
+          if (bufSize <= 0)
+          {
+            NFD_LOG_ERROR("Trying to send a packet with no size");
+            pthread_mutex_unlock(&threadLock);
+            continue;
+          }
 
           // copy the buffer into a cstr so we can send it
-          // char *cstr = new char[buffer.size() + 1];
-          // uint8_t *buff = buffer.buf();
-          // for (size_t i = 0; i < buffer.size(); i++) {
-          //   cstr[i] = buff[i];
-          // }
-          char *cstr = new char[bufSize];
-          int i = 0;
-          auto buf = *(store_packet->getBuffer());
-          for(auto ptr : buf)
-            cstr[i++] = ptr;
-
+          char *cstr = new char[buffer.size() + 1];
+          uint8_t *buff = buffer.buf();
+          for (size_t i = 0; i < buffer.size(); i++) {
+            cstr[i] = buff[i];
+          }
           
           NFD_LOG_INFO("Cstr:" << cstr);
-
 
           try
           {
             NFD_LOG_FACE_INFO("Creating Block from data that will be sent");
-            ndn::Block element = ndn::Block((uint8_t*)my_packet, bufSize);
+            ndn::Block element;
+            std::tie(isOk, element) = Block::fromBuffer(buffer.buf(), buffer.size());
+            if (!isOk) {
+              NFD_LOG_FACE_WARN("Failed create Block");
+            }
             NFD_LOG_FACE_INFO("Block creation successful");
           }
           catch(const std::exception& e)
