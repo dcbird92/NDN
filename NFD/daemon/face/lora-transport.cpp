@@ -97,7 +97,7 @@ void *LoRaTransport::transmit_and_recieve()
       if (toSend) {
           NFD_LOG_ERROR("toSend is true");
           ndn::EncodingBuffer buffer(*store_packet);
-          NFD_LOG_ERROR("toSend after allocate buffer");
+          NFD_LOG_ERROR("toSend after allocate bufferr");
           if (buffer.size() <= 0) {
 
             NFD_LOG_ERROR("Trying to send a packet with no size");
@@ -116,12 +116,13 @@ void *LoRaTransport::transmit_and_recieve()
           {
             // print block size because we don't want to count the padding in buffer
             NFD_LOG_INFO("Successfully sent: " << buffer.size() << " bytes");
+            NFD_LOG_FACE_TRACE("Successfully sent message: " << std::string(cstr));
             toSend = false;
           }
 
           // After sending enter recieve mode again
           sx1272.receive();
-          free(cstr);
+          delete[] cstr;
           pthread_mutex_unlock(&threadLock);
       }
       // Otherwise check and see if there is available data
