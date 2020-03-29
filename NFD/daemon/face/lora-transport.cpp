@@ -98,8 +98,8 @@ void *LoRaTransport::transmit_and_recieve()
           // ndn::EncodingBuffer buffer(*store_packet);
           int bufSize = store_packet->size();
           NFD_LOG_ERROR("toSend after allocate bufferr");
-          if (buffer.size() <= 0) 
-            NFD_LOG_ERROR("Trying to send a packet with no size");
+          // if (buffer.size() <= 0) 
+          //   NFD_LOG_ERROR("Trying to send a packet with no size");
 
 
           // copy the buffer into a cstr so we can send it
