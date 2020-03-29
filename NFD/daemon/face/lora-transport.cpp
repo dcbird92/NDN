@@ -162,6 +162,13 @@ void LoRaTransport::handleRead() {
 
         NFD_LOG_ERROR("Received packet: ");
         NFD_LOG_ERROR(my_packet);
+        NFD_LOG_ERROR("Packet ascii:")
+        auto gotStuff = std::string();
+        for(int idx = 0; idx < i; idx++)
+        {
+          gotStuff += to_string((int)my_packet[idx]);
+        }
+        NFD_LOG_ERROR(gotStuff)
       }
       else {
         NFD_LOG_ERROR("Unable to get packet data: " + std::to_string(e));
