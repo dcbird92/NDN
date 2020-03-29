@@ -66,7 +66,7 @@ void LoRaTransport::sendPacket(const ndn::Block &block) {
 
   // copy the buffer into a cstr so we can send it
   // char *cstr = new char[buffer.size() + 1];
-  char *cstr = new char[MAX_NDN_PACKET_SIZE];
+  char *cstr = new char[ndn::MAX_NDN_PACKET_SIZE];
   // uint8_t *buff = buffer.buf();
 
   int i = 0;
