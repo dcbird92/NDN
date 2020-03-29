@@ -102,17 +102,25 @@ void *LoRaTransport::transmit_and_recieve()
             NFD_LOG_ERROR("Trying to send a packet with no size");
           }
 
-          // copy the buffer into a cstr so we can send it
-          char *cstr = new char[buffer.size() + 1];
-          uint8_t *buff = buffer.buf();
-          for (size_t i = 0; i < buffer.size(); i++) {
-            cstr[i] = buff[i];
-          }
+          int bufSize = (*store_packet).size();
 
+          // copy the buffer into a cstr so we can send it
+          // char *cstr = new char[buffer.size() + 1];
+          uint8_t *buff = buffer.buf();
+          // for (size_t i = 0; i < buffer.size(); i++) {
+          //   cstr[i] = buff[i];
+          // }
+          char *cstr = new char[bufSize];
+          int i = 0;
+          for(auto ptr = block.begin(); ptr < block.end(); ptr++)
+          {
+            cstr[i++] = *ptr;
+          }
+          
           try
           {
             NFD_LOG_FACE_INFO("Creating Block from data that will be sent");
-            ndn::Block element = ndn::Block((uint8_t*)my_packet, buffer.size());
+            ndn::Block element = ndn::Block((uint8_t*)my_packet, bufSize);
             NFD_LOG_FACE_INFO("Block creation successful");
           }
           catch(const std::exception& e)
@@ -126,9 +134,9 @@ void *LoRaTransport::transmit_and_recieve()
           else
           {
             // print block size because we don't want to count the padding in buffer
-            NFD_LOG_INFO("Successfully sent: " << buffer.size() << " bytes");
+            NFD_LOG_INFO("Successfully sent: " << bufSize << " bytes");
             auto sentStuff = std::string();
-            for(int idx = 0; idx < buffer.size(); idx++)
+            for(int idx = 0; idx < bufSize; idx++)
             {
               sentStuff += to_string((int)cstr[idx]);
             }
