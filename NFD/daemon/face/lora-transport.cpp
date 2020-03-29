@@ -169,8 +169,6 @@ void LoRaTransport::handleRead() {
       dataToConsume = sx1272.checkForData();
     }
 
-    ndn::Block element = ndn::Block((uint8_t*)my_packet, i);
-
     NDN_LOG_ERROR("i:" + std::to_string(i) + "\n");
     NDN_LOG_ERROR("packet:");
     NDN_LOG_ERROR(my_packet);
@@ -179,6 +177,8 @@ void LoRaTransport::handleRead() {
     for (int j = 0; j < i; j++) {
       NDN_LOG_ERROR(my_packet[j]);
     }
+
+    ndn::Block element = ndn::Block((uint8_t*)my_packet, i);
 
     this->receive(element);
 } 
