@@ -161,11 +161,16 @@ void LoRaTransport::handleRead() {
     }
 
     bool isOk = false;
-    Block element;
+    ndn::Block element;
+
+    NDN_LOG_ERROR("i:" + std::to_string(i) + "\n");
+    NDN_LOG_ERROR("packet:");
+    NDN_LOG_ERROR(my_packet);
+    NDN_LOG_ERROR("\n");
 
     // Convert my_packet char [] --> const uint8_t*
     const uint8_t* buffer_ptr = (uint8_t*)my_packet;
-    std::tie(isOk, element) = Block::fromBuffer(buffer_ptr, i);
+    std::tie(isOk, element) = ndn::Block::fromBuffer(buffer_ptr, i);
     if (!isOk) {
       NFD_LOG_ERROR("Failed to parse incoming packet");
       // This packet won't extend the face lifetime
