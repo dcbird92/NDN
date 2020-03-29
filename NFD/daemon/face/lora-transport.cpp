@@ -63,7 +63,7 @@ void LoRaTransport::sendPacket(const ndn::Block &block) {
   if (block.size() <= 0) {
     NFD_LOG_FACE_ERROR("Trying to send a packet with no size");
   }
-
+  NFD_LOG_FACE_TRACE("LoRaTransport::sendPacket");
   // copy the buffer into a cstr so we can send it
   char *cstr = new char[ndn::MAX_NDN_PACKET_SIZE];
   int i = 0;
@@ -79,7 +79,7 @@ void LoRaTransport::sendPacket(const ndn::Block &block) {
   {
     // print block size because we don't want to count the padding in buffer
     NFD_LOG_FACE_TRACE("Successfully sent: " << block.size() << " bytes");
-    NFD_LOG_FACE_TRACE("Successfully sent message: " << cstr);
+    NFD_LOG_FACE_TRACE("Successfully sent message: " << std::string(cstr));
   }
 
   // After sending enter recieve mode again
