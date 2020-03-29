@@ -112,11 +112,11 @@ void *LoRaTransport::transmit_and_recieve()
           // }
           char *cstr = new char[bufSize];
           int i = 0;
-          for(auto ptr = block.begin(); ptr < block.end(); ptr++)
+          for(auto ptr = *store_packet.begin(); ptr < *store_packet.end(); ptr++)
           {
             cstr[i++] = *ptr;
           }
-          
+
           try
           {
             NFD_LOG_FACE_INFO("Creating Block from data that will be sent");
