@@ -110,9 +110,9 @@ void *LoRaTransport::transmit_and_recieve()
           // }
           char *cstr = new char[bufSize];
           int i = 0;
-          auto buf = store_packet->getBuffer();
+          auto buf = *(store_packet->getBuffer());
           for(auto ptr : buf)
-            cstr[i++] = *ptr;
+            cstr[i++] = ptr;
 
           
           NFD_LOG_INFO("Cstr:" << cstr);
