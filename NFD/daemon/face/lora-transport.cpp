@@ -108,6 +108,18 @@ void *LoRaTransport::transmit_and_recieve()
           for (size_t i = 0; i < buffer.size(); i++) {
             cstr[i] = buff[i];
           }
+
+          try
+          {
+            NFD_LOG_FACE_INFO("Creating Block from data that will be sent");
+            ndn::Block element = ndn::Block((uint8_t*)my_packet, i);
+            NFD_LOG_FACE_INFO("Block creation successful");
+          }
+          catch(const std::exception& e)
+          {
+            NFD_LOG_ERROR("Block create exception DURING SEND: " << e.what());
+          }
+
           if ((nfd::face::LoRaTransport::e = sx1272.sendPacketTimeout(0, cstr)) != 0) {
               NFD_LOG_ERROR("Send operation failed: " + std::to_string(e));
           }  
