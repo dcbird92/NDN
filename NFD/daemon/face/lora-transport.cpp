@@ -118,6 +118,7 @@ void *LoRaTransport::transmit_and_recieve()
           {
             NFD_LOG_FACE_INFO("Creating Block from data that will be sent");
             ndn::Block element;
+            bool isOk = false;
             std::tie(isOk, element) = Block::fromBuffer(buffer.buf(), buffer.size());
             if (!isOk) {
               NFD_LOG_FACE_WARN("Failed create Block");
