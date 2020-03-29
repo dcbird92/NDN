@@ -112,7 +112,7 @@ void *LoRaTransport::transmit_and_recieve()
           try
           {
             NFD_LOG_FACE_INFO("Creating Block from data that will be sent");
-            ndn::Block element = ndn::Block((uint8_t*)my_packet, i);
+            ndn::Block element = ndn::Block((uint8_t*)my_packet, buffer.size());
             NFD_LOG_FACE_INFO("Block creation successful");
           }
           catch(const std::exception& e)
