@@ -161,7 +161,7 @@ void LoRaTransport::handleRead() {
     }
 
     bool isOk = false;
-    ndn::Block element;
+    ndn::Block element = ndn::Block((uint8_t*)my_packet, i);
 
     NDN_LOG_ERROR("i:" + std::to_string(i) + "\n");
     NDN_LOG_ERROR("packet:");
@@ -172,7 +172,7 @@ void LoRaTransport::handleRead() {
       NDN_LOG_ERROR(my_packet[j]);
     }
 
-    this->receive(my_packet);
+    this->receive(element);
 } 
 
 void LoRaTransport::handleError(const std::string &errorMessage) {
