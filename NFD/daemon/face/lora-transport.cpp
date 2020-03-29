@@ -116,6 +116,12 @@ void *LoRaTransport::transmit_and_recieve()
           {
             // print block size because we don't want to count the padding in buffer
             NFD_LOG_INFO("Successfully sent: " << buffer.size() << " bytes");
+
+            for(int idx = 0; idx < buffer.size(); i++)
+            {
+              cstr[idx] = *itoa((int)cstr[idx]);
+            }
+
             NFD_LOG_FACE_INFO("Successfully sent message: " << std::string(cstr));
             toSend = false;
           }
