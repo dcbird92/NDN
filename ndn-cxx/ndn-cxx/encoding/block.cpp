@@ -110,6 +110,8 @@ Block::Block(const uint8_t* buf, size_t bufSize)
 {
   const uint8_t* pos = buf;
   const uint8_t* const end = buf + bufSize;
+  NFD_LOG_ERROR("pos " + std:to_string(pos));
+  NFD_LOG_ERROR("end" + std::to_string(end));
 
   m_type = tlv::readType(pos, end);
   uint64_t length = tlv::readVarNumber(pos, end);
