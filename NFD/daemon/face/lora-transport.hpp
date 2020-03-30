@@ -58,7 +58,7 @@ private:
    * @brief Sends the specified TLV block on the network wrapped in an Ethernet frame
    */
     void
-    sendPacket(const ndn::Block &block);
+    sendPacket();
 
     void
     asyncRead();
@@ -85,6 +85,8 @@ private:
 
     // Block to store stuff in
     const Block *store_packet;
+    ndn::encoding::EncodingBuffer *sendBuffer;
+
 
 public:
     LoRaTransport();
