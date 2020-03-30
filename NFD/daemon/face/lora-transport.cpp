@@ -106,13 +106,13 @@ void *LoRaTransport::transmit_and_recieve()
           }
 
           // copy the buffer into a cstr so we can send it
-          char *cstr = new char[buffer.size() + 1];
-          uint8_t *buff = buffer.buf();
-          for (size_t i = 0; i < buffer.size(); i++) {
-            cstr[i] = buff[i];
-          }
+          // char *cstr = new char[buffer.size() + 1];
+          // uint8_t *buff = buffer.buf();
+          // for (size_t i = 0; i < buffer.size(); i++) {
+          //   cstr[i] = buff[i];
+          // }
           
-          NFD_LOG_INFO("Cstr:" << cstr);
+          // NFD_LOG_INFO("Cstr:" << cstr);
 
           try
           {
@@ -130,11 +130,21 @@ void *LoRaTransport::transmit_and_recieve()
             NFD_LOG_ERROR("Block create exception DURING SEND: " << e.what());
           }
 
-          if ((nfd::face::LoRaTransport::e = sx1272.sendPacketTimeout(0, cstr)) != 0) {
+          if ((nfd::face::LoRaTransport::e = sx1272.sendPacketTimeout(0, buffer.buf(), (uint16_t)buffer.size())) != 0) {
               NFD_LOG_ERROR("Send operation failed: " + std::to_string(e));
           }  
           else
           {
+            if(sx1272.getPayloadLength())
+            {
+              NFD_LOG_FACE_INFO("Payload length" << sx1272._payloadlength);
+            }
+            else
+            {
+              NFD_LOG_ERROR("getPayloadLength() failed");
+            }
+            
+
             // print block size because we don't want to count the padding in buffer
             NFD_LOG_INFO("Successfully sent: " << bufSize << " bytes");
             auto sentStuff = std::string();
@@ -149,7 +159,7 @@ void *LoRaTransport::transmit_and_recieve()
 
           // After sending enter recieve mode again
           sx1272.receive();
-          delete[] cstr;
+          // delete[] cstr;
           pthread_mutex_unlock(&threadLock);
       }
       // Otherwise check and see if there is available data
