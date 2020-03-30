@@ -51,9 +51,9 @@ void LoRaTransport::doSend(const Block &packet, const EndpointId& endpoint) {
   pthread_mutex_lock(&threadLock);
   store_packet = &packet;
   toSend = true;
+  NFD_LOG_ERROR("2");
   pthread_mutex_unlock(&threadLock);
   NFD_LOG_ERROR(__func__);
-  NFD_LOG_ERROR("2");
 }
 
 void LoRaTransport::sendPacket(const ndn::Block &block) {
@@ -96,8 +96,9 @@ void *LoRaTransport::transmit_and_recieve()
       if (toSend) {
           NFD_LOG_ERROR("toSend is true");
           ndn::EncodingBuffer buffer(*store_packet);
-          int bufSize = buffer.size();
           NFD_LOG_ERROR("toSend after allocate bufferr");
+          int bufSize = buffer.size();
+          NFD_LOG_ERROR("after size()");
           if (bufSize <= 0)
           {
             NFD_LOG_ERROR("Trying to send a packet with no size");
@@ -130,7 +131,7 @@ void *LoRaTransport::transmit_and_recieve()
           //   NFD_LOG_ERROR("Block create exception DURING SEND: " << e.what());
           // }
 
-          NFD_LOG_INFO("buffer size:" << buffer.size());
+          NFD_LOG_INFO("buffer size:" << bufSize);
 
           if ((nfd::face::LoRaTransport::e = sx1272.sendPacketTimeout(0, buffer.buf(), (uint16_t)buffer.size())) != 0) {
               NFD_LOG_ERROR("Send operation failed: " + std::to_string(e));
