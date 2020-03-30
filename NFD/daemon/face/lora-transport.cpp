@@ -70,17 +70,14 @@ void LoRaTransport::sendPacket()
   }
 
   // copy the buffer into a cstr so we can send it
-  // char *cstr = new char[bufSize + 2];
-  // char * cstr = new char[bufSize];
-  char *cstr = "aaaaaaaa\0aaaaaaaaaaaaaaa";
-  bufSize = 24;
+  char * cstr = new char[bufSize];
   int i = 0;
-  // for (auto ptr : *sendBuffer)
-  // {
-  //   cstr[i++] = ptr;
-  //   if(ptr == NULL)
-  //     NFD_LOG_ERROR("Found null in send packet at idx: " << i);
-  // }
+  for (auto ptr : *sendBuffer)
+  {
+    cstr[i++] = ptr;
+    if(ptr == NULL)
+      NFD_LOG_ERROR("Found null in send packet at idx: " << i);
+  }
 
   if (i != bufSize)
     NFD_LOG_ERROR("Sizes different. i: " << i << " bufSize: " << bufSize);
@@ -172,10 +169,9 @@ void LoRaTransport::handleRead() {
   NDN_LOG_ERROR("i:" + std::to_string(i) + "\n");
   NDN_LOG_ERROR("Full packet:" << my_packet);
   auto gotStuff = std::string();
-  int idx = 0;
-  while(my_packet[idx])
+  for(int idx = 0; idx < sx1272.packet_received.length; idx++)
   {
-    gotStuff += to_string((int)my_packet[idx++]);
+    gotStuff += to_string((int)my_packet[idx]);
   }
   NFD_LOG_INFO("Packet ascii:" << gotStuff);
 
