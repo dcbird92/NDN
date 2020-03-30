@@ -114,21 +114,23 @@ void *LoRaTransport::transmit_and_recieve()
           
           // NFD_LOG_INFO("Cstr:" << cstr);
 
-          try
-          {
-            NFD_LOG_FACE_INFO("Creating Block from data that will be sent");
-            ndn::Block element;
-            bool isOk = false;
-            std::tie(isOk, element) = Block::fromBuffer(buffer.buf(), buffer.size());
-            if (!isOk) {
-              NFD_LOG_FACE_WARN("Failed create Block");
-            }
-            NFD_LOG_FACE_INFO("Block creation successful");
-          }
-          catch(const std::exception& e)
-          {
-            NFD_LOG_ERROR("Block create exception DURING SEND: " << e.what());
-          }
+          // try
+          // {
+          //   NFD_LOG_FACE_INFO("Creating Block from data that will be sent");
+          //   ndn::Block element;
+          //   bool isOk = false;
+          //   std::tie(isOk, element) = Block::fromBuffer(buffer.buf(), buffer.size());
+          //   if (!isOk) {
+          //     NFD_LOG_FACE_WARN("Failed create Block");
+          //   }
+          //   NFD_LOG_FACE_INFO("Block creation successful");
+          // }
+          // catch(const std::exception& e)
+          // {
+          //   NFD_LOG_ERROR("Block create exception DURING SEND: " << e.what());
+          // }
+
+          NFD_LOG_INFO("buffer size:" << buffer.size());
 
           if ((nfd::face::LoRaTransport::e = sx1272.sendPacketTimeout(0, buffer.buf(), (uint16_t)buffer.size())) != 0) {
               NFD_LOG_ERROR("Send operation failed: " + std::to_string(e));
