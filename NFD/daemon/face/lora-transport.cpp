@@ -148,7 +148,7 @@ void LoRaTransport::handleRead() {
     sx1272.getPayloadLength();
     if (e == 0) {
       NFD_LOG_ERROR("Data available to receive");
-      int packetLength = (int)sx1272.packet_received.length;
+      int packetLength = (int)sx1272.getCurrentPacketLength();
       for (i = 0; i < packetLength; i++)
       {
           my_packet[i] = (char)sx1272.packet_received.data[i];
@@ -169,7 +169,7 @@ void LoRaTransport::handleRead() {
   NDN_LOG_ERROR("i:" + std::to_string(i) + "\n");
   NDN_LOG_ERROR("Full packet:" << my_packet);
   auto gotStuff = std::string();
-  for(int idx = 0; idx < sx1272.packet_received.length; idx++)
+  for(int idx = 0; idx < sx1272.getCurrentPacketLength(); idx++)
   {
     gotStuff += to_string((int)my_packet[idx]);
   }
