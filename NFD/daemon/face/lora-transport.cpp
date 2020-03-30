@@ -150,7 +150,7 @@ void *LoRaTransport::transmit_and_recieve()
             auto sentStuff = std::string();
             for(int idx = 0; idx < bufSize; idx++)
             {
-              sentStuff += to_string((int)cstr[idx]);
+              sentStuff += to_string((int)buffer.buf()[idx]);
             }
 
             NFD_LOG_FACE_INFO("Successfully sent message: " << sentStuff);
