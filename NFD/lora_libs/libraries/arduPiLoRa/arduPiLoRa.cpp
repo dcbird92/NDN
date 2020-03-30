@@ -4028,6 +4028,55 @@ uint8_t SX1272::setPayload(char *payload)
 	return state_f;
 }
 
+
+/*
+*** ADDED
+** For payload length
+
+ Function: It sets a char array payload packet in a packet struct.
+ Returns:  Integer that determines if there has been any error
+   state = 2  --> The command has not been executed
+   state = 1  --> There has been an error while executing the command
+   state = 0  --> The command has been executed with no errors
+*/
+uint8_t SX1272::setPayload(char *payload, uint16_t payloadLength)
+{
+	uint8_t state = 2;
+	uint8_t state_f = 2;
+
+	#if (SX1272_debug_mode > 1)
+		printf("\n");
+		printf("Starting 'setPayload'\n");
+	#endif
+
+	state = 1;
+	state = truncPayload(payloadLength);
+	if( state == 0 )
+	{
+		// fill data field until the end of the string
+		for(unsigned int i = 0; i < _payloadlength; i++)
+		{
+			packet_sent.data[i] = payload[i];
+		}
+	}
+	else
+	{
+		state_f = state;
+	}
+	if( ( _modem == FSK ) && ( _payloadlength > MAX_PAYLOAD_FSK ) )
+	{
+		_payloadlength = MAX_PAYLOAD_FSK;
+		state = 1;
+		#if (SX1272_debug_mode > 1)
+			printf("In FSK, payload length must be less than 60 bytes.\n");
+			printf("\n");
+		#endif
+	}
+	// set length with the actual counter value
+	state_f = setPacketLength();	// Setting packet length in packet structure
+	return state_f;
+}
+
 /*
  Function: It sets an uint8_t array payload packet in a packet struct.
  Returns:  Integer that determines if there has been any error
@@ -4098,6 +4147,102 @@ uint8_t SX1272::setPacket(uint8_t dest, char *payload)
 		if( state == 0 )
 		{
 			state = setPayload(payload);
+		}
+	}
+	else
+	{
+		if( _retries == 1 )
+		{
+			packet_sent.length++;
+		}
+		state = setPacketLength();
+		packet_sent.retry = _retries;
+		#if (SX1272_debug_mode > 0)
+			printf("** Retrying to send last packet ");
+			printf("%d", _retries);
+			printf(" time **\n");
+		#endif
+	}
+	writeRegister(REG_FIFO_ADDR_PTR, 0x80);  // Setting address pointer in FIFO data buffer
+	if( state == 0 )
+	{
+		state = 1;
+		// Writing packet to send in FIFO
+		writeRegister(REG_FIFO, packet_sent.dst); 		// Writing the destination in FIFO
+		writeRegister(REG_FIFO, packet_sent.src);		// Writing the source in FIFO
+		writeRegister(REG_FIFO, packet_sent.packnum);	// Writing the packet number in FIFO
+		writeRegister(REG_FIFO, packet_sent.length); 	// Writing the packet length in FIFO
+		for(unsigned int i = 0; i < _payloadlength; i++)
+		{
+			writeRegister(REG_FIFO, packet_sent.data[i]);  // Writing the payload in FIFO
+		}
+		writeRegister(REG_FIFO, packet_sent.retry);		// Writing the number retry in FIFO
+		state = 0;
+		#if (SX1272_debug_mode > 0)
+				printf("## Packet set and written in FIFO ##\n");
+				// Print the complete packet if debug_mode
+				printf("## Packet to send:  \n");
+				printf("Destination: ");
+				printf("%d\n", packet_sent.dst);			 	// Printing destination
+				printf("Source: ");
+				printf("%d\n", packet_sent.src);			 	// Printing source
+				printf("Packet number: ");
+				printf("%d\n", packet_sent.packnum);			// Printing packet number
+				printf("Packet length: ");
+				printf("%d\n", packet_sent.length);			// Printing packet length
+				printf("Data: ");
+				for(unsigned int i = 0; i < _payloadlength; i++)
+				{
+					printf("%c", packet_sent.data[i]);		// Printing payload
+				}
+				printf("\n");
+				printf("Retry number: ");
+				printf("%d\n", packet_sent.retry);			// Printing number retry
+				printf(" ##\n");
+				printf("\n");
+			#endif
+	}
+
+	return state;
+}
+
+/*
+*** ADDED ***
+** for payload length **
+ Function: It sets a packet struct in FIFO in order to sent it.
+ Returns:  Integer that determines if there has been any error
+   state = 2  --> The command has not been executed
+   state = 1  --> There has been an error while executing the command
+   state = 0  --> The command has been executed with no errors
+*/
+uint8_t SX1272::setPacket(uint8_t dest, char *payload, uint16_t payloadLength)
+{
+	int8_t state = 2;
+
+
+	#if (SX1272_debug_mode > 1)
+		printf("\n");
+		printf("Starting 'setPacket'\n");
+	#endif
+
+	clearFlags();	// Initializing flags
+
+	if( _modem == LORA )
+	{ // LoRa mode
+		writeRegister(REG_OP_MODE, LORA_STANDBY_MODE);	// Stdby LoRa mode to write in FIFO
+	}
+	else
+	{ // FSK mode
+		writeRegister(REG_OP_MODE, FSK_STANDBY_MODE);	// Stdby FSK mode to write in FIFO
+	}
+
+	_reception = CORRECT_PACKET;	// Updating incorrect value
+	if( _retries == 0 )
+	{ // Updating this values only if is not going to re-send the last packet
+		state = setDestination(dest);	// Setting destination in packet structure
+		if( state == 0 )
+		{
+			state = setPayload(payload, payloadLength);
 		}
 	}
 	else
@@ -4404,6 +4549,32 @@ uint8_t SX1272::sendPacketTimeout(uint8_t dest, char *payload)
 		printf("Starting 'sendPacketTimeout'\n");
 	#endif
 	state = setPacket(dest, payload);	// Setting a packet with 'dest' destination
+	if (state == 0)								// and writing it in FIFO.
+	{
+		state = sendWithTimeout();	// Sending the packet
+	}
+	return state;
+}
+
+/*
+*** ADDED FOR U OF U PROJECT ****
+** Calls the custom setPacket **
+
+ Function: Configures the module to transmit information.
+ Returns: Integer that determines if there has been any error
+   state = 2  --> The command has not been executed
+   state = 1  --> There has been an error while executing the command
+   state = 0  --> The command has been executed with no errors
+*/
+uint8_t SX1272::sendPacketTimeout(uint8_t dest, char *payload, int payloadLength)
+{
+	uint8_t state = 2;
+
+	#if (SX1272_debug_mode > 1)
+		printf("\n");
+		printf("Starting 'sendPacketTimeout'\n");
+	#endif
+	state = setPacket(dest, payload, (uint16_t)payloadLength);	// Setting a packet with 'dest' destination
 	if (state == 0)								// and writing it in FIFO.
 	{
 		state = sendWithTimeout();	// Sending the packet

@@ -771,6 +771,9 @@ public:
 	*/
 	uint8_t setPacket(uint8_t dest, char *payload);
 
+	// *** ADDED
+	uint8_t setPacket(uint8_t dest, char *payload, uint16_t payloadLength);
+
 	//! It writes a packet in FIFO in order to send it.
 	/*!
 	\param uint8_t dest : packet destination.
@@ -857,6 +860,9 @@ public:
 	\return '0' on success, '1' otherwise
 	*/
 	uint8_t sendPacketTimeout(uint8_t dest, char *payload);
+
+	// ** ADDED
+	uint8_t sendPacketTimeout(uint8_t dest, char *payload, int payloadLength);
 
 	//! It sends the packet wich payload is a parameter before ending MAX_TIMEOUT.
 	/*!
@@ -959,6 +965,9 @@ public:
 	\return '0' on success, '1' otherwise
 	 */
 	uint8_t setPayload(char *payload);
+
+	// ***  ADDED
+	uint8_t setPayload(char *payload, uint16_t payloadLength);
 
 	//! It sets the payload of the packet that is going to be sent.
   	/*!
