@@ -45,9 +45,7 @@ void LoRaTransport::doClose() {
 }
 
 void LoRaTransport::doSend(const Block &packet, const EndpointId& endpoint) {
-  NFD_LOG_FACE_TRACE(__func__);
-
-  
+  NFD_LOG_FACE_TRACE("\n\n" << __func__);
 
   // Set the flag high that we have a packet to transmit, and grab the data to send
   pthread_mutex_lock(&threadLock);
@@ -87,7 +85,7 @@ void LoRaTransport::sendPacket()
   {
     sentStuff += to_string((int)cstr[idx]) + ", ";
   }
-  NFD_LOG_FACE_INFO("Message that was to be sent: " << sentStuff);
+  NFD_LOG_INFO("Message that was to be sent: " << sentStuff);
 
   if ((nfd::face::LoRaTransport::e = sx1272.sendPacketTimeout(0, cstr, bufSize)) != 0)
   {
@@ -116,7 +114,7 @@ void *LoRaTransport::transmit_and_recieve()
       pthread_mutex_lock(&threadLock);
       // Check and see if there is something to send
       if (toSend) {
-          NFD_LOG_ERROR("toSend is true");
+          NFD_LOG_INFO("toSend is true");
           sendPacket();
           toSend = false;
 
@@ -147,7 +145,7 @@ void LoRaTransport::handleRead() {
     e = sx1272.getPacket();
     sx1272.getPayloadLength();
     if (e == 0) {
-      NFD_LOG_ERROR("Data available to receive");
+      NFD_LOG_INFO("\n\nData available to receive");
       int packetLength = (int)sx1272.getCurrentPacketLength();
       for (i = 0; i < packetLength; i++)
       {
@@ -166,10 +164,10 @@ void LoRaTransport::handleRead() {
     dataToConsume = sx1272.checkForData();
   }
 
-  NDN_LOG_ERROR("i:" + std::to_string(i) + "\n");
-  NDN_LOG_ERROR("Full packet:" << my_packet);
+  NFD_LOG_INFO("i:" + std::to_string(i));
+  NFD_LOG_INFO("Full packet:" << my_packet);
   auto gotStuff = std::string();
-  for(int idx = 0; idx < sx1272.getCurrentPacketLength(); idx++)
+  for(int idx = 0; idx < i; idx++)
   {
     gotStuff += to_string((int)my_packet[idx]);
   }
@@ -177,8 +175,11 @@ void LoRaTransport::handleRead() {
 
   try
   {
+    NFD_LOG_INFO("Creating block");
     ndn::Block element = ndn::Block((uint8_t*)my_packet, i);
+    NFD_LOG_INFO("Created block I spose");
     this->receive(element);
+    NFD_LOG_INFO("Called receive with blockz");
   }
   catch(const std::exception& e)
   {
