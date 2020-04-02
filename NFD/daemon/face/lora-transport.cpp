@@ -19,7 +19,7 @@ LoRaTransport::LoRaTransport() {
 
     // setScope(ndn::nfd::FaceScope scope);
     // setLinkType(linkType);
-    this->setMtu(250);
+    this->setMtu(99);
 
     // setSendQueueCapacity(ssize_t sendQueueCapacity);
     // setState(TransportState newState);
@@ -45,14 +45,14 @@ void LoRaTransport::doClose() {
 }
 
 void LoRaTransport::doSend(const Block &packet, const EndpointId& endpoint) {
-  NFD_LOG_FACE_TRACE("\n\n" << __func__);
+  NFD_LOG_FACE_TRACE(__func__);
 
   // Set the flag high that we have a packet to transmit, and grab the data to send
   pthread_mutex_lock(&threadLock);
   // store_packet = &packet;
   sendBuffer = new ndn::EncodingBuffer(packet);
   toSend = true;
-  NFD_LOG_TRACE("2");
+  NFD_LOG_TRACE("\n\ndoSend: toSend set to true");
   pthread_mutex_unlock(&threadLock);
 
   NFD_LOG_TRACE(__func__);
@@ -67,14 +67,16 @@ void LoRaTransport::sendPacket()
     return;
   }
 
+  NFD_LOG_INFO("Packet size to be sent: " << bufSize);
+
   // copy the buffer into a cstr so we can send it
   char * cstr = new char[bufSize];
   int i = 0;
   for (auto ptr : *sendBuffer)
   {
     cstr[i++] = ptr;
-    if(ptr == NULL)
-      NFD_LOG_ERROR("Found null in send packet at idx: " << i);
+    if(ptr == '\0')
+      // NFD_LOG_ERROR("Found null in send packet at idx: " << i);
   }
 
   if (i != bufSize)
@@ -85,7 +87,7 @@ void LoRaTransport::sendPacket()
   {
     sentStuff += to_string((int)cstr[idx]) + ", ";
   }
-  NFD_LOG_INFO("Message that was to be sent: " << sentStuff);
+  NFD_LOG_INFO("Message that is to be sent: " << sentStuff);
 
   if ((nfd::face::LoRaTransport::e = sx1272.sendPacketTimeout(0, cstr, bufSize)) != 0)
   {
