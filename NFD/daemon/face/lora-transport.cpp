@@ -160,6 +160,7 @@ void LoRaTransport::handleRead() {
     }
     else {
       NFD_LOG_ERROR("Unable to get packet data: " + std::to_string(e));
+      return;
     }
     dataToConsume = sx1272.checkForData();
   }
