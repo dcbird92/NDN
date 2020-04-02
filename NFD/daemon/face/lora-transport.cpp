@@ -123,12 +123,12 @@ void *LoRaTransport::transmit_and_recieve()
           NFD_LOG_INFO("toSend is true");
           sendBuffer = sendBufferQueue.front();
           sendBufferQueue.pop();
-
+          
           sendPacket();
           
           toSend = sendBufferQueue.empty() == false;
         }
-        
+
         // After sending enter recieve mode again
         sx1272.receive();
         pthread_mutex_unlock(&threadLock);

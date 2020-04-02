@@ -86,7 +86,7 @@ private:
     // Block to store stuff in
     const Block *store_packet;
     ndn::encoding::EncodingBuffer *sendBuffer;
-    queue<ndn::encoding::EncodingBuffer *> sendBufferQueue;
+    std::queue<ndn::encoding::EncodingBuffer *> sendBufferQueue;
 
 public:
     LoRaTransport();
