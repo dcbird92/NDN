@@ -76,7 +76,9 @@ void LoRaTransport::sendPacket()
   {
     cstr[i++] = ptr;
     if(ptr == '\0')
+    {
       // NFD_LOG_ERROR("Found null in send packet at idx: " << i);
+    }
   }
 
   if (i != bufSize)
