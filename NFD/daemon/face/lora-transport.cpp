@@ -52,7 +52,7 @@ void LoRaTransport::doSend(const Block &packet, const EndpointId& endpoint) {
   // store_packet = &packet;
   sendBuffer = new ndn::EncodingBuffer(packet);
   toSend = true;
-  NFD_LOG_TRACE("\n\ndoSend: toSend set to true");
+  NFD_LOG_INFO("\n\ndoSend: toSend set to true");
   pthread_mutex_unlock(&threadLock);
 
   NFD_LOG_TRACE(__func__);
@@ -169,7 +169,7 @@ void LoRaTransport::handleRead() {
     dataToConsume = sx1272.checkForData();
   }
 
-  NFD_LOG_INFO("i:" + std::to_string(i));
+  NFD_LOG_INFO("i: " + std::to_string(i));
   NFD_LOG_INFO("Full packet:" << my_packet);
   auto gotStuff = std::string();
   for(int idx = 0; idx < i; idx++)
@@ -180,11 +180,9 @@ void LoRaTransport::handleRead() {
 
   try
   {
-    NFD_LOG_INFO("Creating block");
     ndn::Block element = ndn::Block((uint8_t*)my_packet, i);
-    NFD_LOG_INFO("Created block I spose");
     this->receive(element);
-    NFD_LOG_INFO("Called receive with blockz");
+    NFD_LOG_INFO("Created block succesfully and called receive");
   }
   catch(const std::exception& e)
   {
