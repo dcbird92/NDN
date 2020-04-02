@@ -50,9 +50,10 @@ void LoRaTransport::doSend(const Block &packet, const EndpointId& endpoint) {
   // Set the flag high that we have a packet to transmit, and grab the data to send
   pthread_mutex_lock(&threadLock);
   // store_packet = &packet;
-  sendBuffer = new ndn::EncodingBuffer(packet);
+  // sendBuffer = new ndn::EncodingBuffer(packet);
+  sendBufferQueue.push(new ndn::EncodingBuffer(packet));
   toSend = true;
-  NFD_LOG_INFO("\n\ndoSend: toSend set to true");
+  NFD_LOG_INFO("\n\ndoSend: added item to queue, set toSend true");
   pthread_mutex_unlock(&threadLock);
 
   NFD_LOG_TRACE(__func__);
@@ -118,13 +119,19 @@ void *LoRaTransport::transmit_and_recieve()
       pthread_mutex_lock(&threadLock);
       // Check and see if there is something to send
       if (toSend) {
+        while(toSend) {
           NFD_LOG_INFO("toSend is true");
-          sendPacket();
-          toSend = false;
+          sendBuffer = sendBufferQueue.front();
+          sendBufferQueue.pop();
 
-          // After sending enter recieve mode again
-          sx1272.receive();
-          pthread_mutex_unlock(&threadLock);
+          sendPacket();
+          
+          toSend = sendBufferQueue.empty() == false;
+        }
+        
+        // After sending enter recieve mode again
+        sx1272.receive();
+        pthread_mutex_unlock(&threadLock);
       }
       // Otherwise check and see if there is available data
       else {
