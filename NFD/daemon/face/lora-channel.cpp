@@ -76,7 +76,7 @@ LoRaChannel::setup(){
   e = sx1272.setHeaderON();
 
   // Select frequency channel
-  e = sx1272.setChannel(CH_10_868);
+  e = sx1272.setChannel(CH_05_900);
 
   // Set CRC
   e = sx1272.setCRC_ON();
