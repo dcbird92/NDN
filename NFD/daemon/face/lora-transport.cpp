@@ -19,7 +19,7 @@ LoRaTransport::LoRaTransport() {
 
     // setScope(ndn::nfd::FaceScope scope);
     // setLinkType(linkType);
-    this->setMtu(99);
+    this->setMtu(160);
 
     // setSendQueueCapacity(ssize_t sendQueueCapacity);
     // setState(TransportState newState);
