@@ -21,13 +21,13 @@ LoRaTransport::LoRaTransport() {
         std::string token;
         while (std::getline(infile, token))
         {
-          NFD_LOG_ERROR(token.substr(0,1));
-          NFD_LOG_ERROR(token.substr(0,3));
+          NFD_LOG_ERROR(token.substr(0,2));
+          NFD_LOG_ERROR(token.substr(0,4));
           // Grab the ID field
-          if (token.substr(0,1) == "id") {
+          if (token.substr(0,2) == "id") {
             id = token[3] - '0';
           }
-          if (token.substr(0,3) == "conn") {
+          if (token.substr(0,4) == "conn") {
             conn = token[5] - '0';
           }
         }
