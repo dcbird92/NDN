@@ -54,12 +54,12 @@ LoRaTransport::LoRaTransport() {
 
     NFD_LOG_ERROR("Send contains:");
     for (const auto& sendAddr: send) {
-      NFD_LOG_ERROR(sendAddr);
+      NFD_LOG_ERROR(std::to_string(sendAddr));
     }
 
     NFD_LOG_ERROR("Recv contains:");
     for (const auto& recvAddr: recv) {
-      NFD_LOG_ERROR(recvAddr);
+      NFD_LOG_ERROR(std::to_string(recvAddr));
     }
 
 
