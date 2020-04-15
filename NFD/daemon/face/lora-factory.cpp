@@ -38,9 +38,8 @@ LoRaFactory::doCreateFace(const CreateFaceRequest& req,
                          const FaceCreatedCallback& onCreated,
                          const FaceCreationFailedCallback& onFailure)
 {
-  NFD_LOG_DEBUG("creeating face");
-  NFD_LOG_DEBUG("local " << req.localUri->getHost());
-  NFD_LOG_DEBUG("remote " << req.remoteUri.getHost());
+  NFD_LOG_DEBUG("calling");
+  NFD_LOG_DEBUG(req.remoteUri.toString());
   for (const auto& i : m_channels) {
       i.second->createFace(req.params, onCreated);
       return;
