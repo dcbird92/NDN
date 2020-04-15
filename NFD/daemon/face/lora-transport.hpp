@@ -82,7 +82,7 @@ private:
 
     // Flag used for reading in a certain network topology
     bool readTopology = true;
-    std::string topologyFilename = "lora-configs/daisy-chain.topology";
+    std::string topologyFilename = "/home/pi/NDN/lora-configs/daisy-chain.topology";
 
     // ID and connections used for implementing a network topology
     int id = 0;
