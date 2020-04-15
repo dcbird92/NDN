@@ -87,8 +87,8 @@ private:
 
     // ID and connections used for implementing a network topology
     int id = 0;
-    std::unordered_set<int> send = std::unordered_set<int>();
-    std::unordered_set<int> recv = std::unordered_set<int>();
+    std::unordered_set<uint8_t> send = std::unordered_set<uint8_t>();
+    std::unordered_set<uint8_t> recv = std::unordered_set<uint8_t>();
 
     // Creating mutexes for shared queue and conditions for when data is produced from console
     pthread_mutex_t threadLock = PTHREAD_MUTEX_INITIALIZER; 

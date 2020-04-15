@@ -34,14 +34,14 @@ LoRaTransport::LoRaTransport() {
           if (token.substr(0,4) == "send") {
             std::istringstream istr (token.substr(5));
             while(std::getline(istr, value, ',')) {
-              send.insert(std::stoi(value));
+              send.insert((uint8_t)(value[0] - '0'));
             }
           }
           // Grab the recv field
           if (token.substr(0,4) == "recv") {
             std::istringstream istr (token.substr(5));
             while(std::getline(istr, value, ',')) {
-              recv.insert(std::stoi(value));
+              recv.insert((uint8_t)(value[0] - '0'));
             }
           }
         }
@@ -120,7 +120,7 @@ void LoRaTransport::sendPacket()
   auto sentStuff = std::string();
   for(int idx = 0; idx < bufSize; idx++)
   {
-    sentStuff += to_string((int)cstr[idx]) + ", ";
+    sentStuff += std::to_string((int)cstr[idx]) + ", ";
   }
   NFD_LOG_INFO("Message that is to be sent: " << sentStuff);
 
@@ -197,6 +197,7 @@ void LoRaTransport::handleRead() {
       if (readTopology && sx1272.packet_received.dst != id &&  recv.find(sx1272.packet_received.src) == recv.end()) {
         // Bad packet, try to read a different one
         NFD_LOG_ERROR("Dropping packet, bad dst or src");
+        dataToConsume = sx1272.checkForData();
         continue;
       }
 
