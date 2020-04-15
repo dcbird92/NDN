@@ -1,5 +1,5 @@
 *.cpp_exe
 NFD/websocketpp
 .vscode/
-lora.config
+lora-configs/*
 
