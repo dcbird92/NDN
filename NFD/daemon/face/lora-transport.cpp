@@ -1,5 +1,5 @@
 /**
- * File used for implementing each of the functions
+ * File used for implementing the transport layer of the LoRa Face
  */
 
 #include "lora-transport.hpp"
@@ -11,25 +11,12 @@ NFD_LOG_INIT(LoRaTransport);
 
 LoRaTransport::LoRaTransport() {
 
-    // Set all of the static variables associated with this transmission 
-    // ** COME BACK TO THIS? **
-    // this->setLocalUri(FaceUri("lora"));
-
-    // this->setRemoteUri(FaceUri("lora-remote"));
-
-    // setScope(ndn::nfd::FaceScope scope);
-    // setLinkType(linkType);
+    // Set all of the static variables associated with this transmission (just need to set MTU)
     this->setMtu(160);
-
-    // setSendQueueCapacity(ssize_t sendQueueCapacity);
-    // setState(TransportState newState);
-    // setExpirationTime(const time::steady_clock::TimePoint& expirationTime);
 
     // Create the neccessary thread to begin receving and transmitting
     pthread_t receive;
     int rc;
-
-    // void (LoRaTransport::*transmit_and_recieve)();
 
     rc = pthread_create(&receive, NULL, &LoRaTransport::transmit_and_receive_helper, this);
     if(rc) {
@@ -45,12 +32,8 @@ void LoRaTransport::doClose() {
 }
 
 void LoRaTransport::doSend(const Block &packet, const EndpointId& endpoint) {
-  NFD_LOG_FACE_TRACE(__func__);
-
-  // Set the flag high that we have a packet to transmit, and grab the data to send
+  // Set the flag high that we have a packet to transmit, and push the new data onto the queue
   pthread_mutex_lock(&threadLock);
-  // store_packet = &packet;
-  // sendBuffer = new ndn::EncodingBuffer(packet);
   sendBufferQueue.push(new ndn::EncodingBuffer(packet));
   toSend = true;
   NFD_LOG_INFO("\n\ndoSend: added item to queue, set toSend true");
@@ -123,9 +106,7 @@ void *LoRaTransport::transmit_and_recieve()
           NFD_LOG_INFO("toSend is true");
           sendBuffer = sendBufferQueue.front();
           sendBufferQueue.pop();
-          
           sendPacket();
-          
           toSend = sendBufferQueue.empty() == false;
         }
 
