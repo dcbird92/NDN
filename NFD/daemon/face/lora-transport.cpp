@@ -34,8 +34,6 @@ LoRaTransport::LoRaTransport() {
           if (token.substr(0,4) == "send") {
             std::istringstream istr (token.substr(5));
             while(std::getline(istr, value, ',')) {
-              NFD_LOG_ERROR("send");
-              NFD_LOG_ERROR(value);
               send.insert(std::stoi(value));
             }
           }
@@ -43,8 +41,6 @@ LoRaTransport::LoRaTransport() {
           if (token.substr(0,4) == "recv") {
             std::istringstream istr (token.substr(5));
             while(std::getline(istr, value, ',')) {
-              NFD_LOG_ERROR("recv");
-              NFD_LOG_ERROR(value);
               recv.insert(std::stoi(value));
             }
           }
@@ -55,6 +51,17 @@ LoRaTransport::LoRaTransport() {
       send.insert(0);
       recv.insert(0);
     }
+
+    NFD_LOG_ERROR("Send contains:");
+    for (const auto& sendAddr: send) {
+      NFD_LOG_ERROR(sendAddr);
+    }
+
+    NFD_LOG_ERROR("Recv contains:");
+    for (const auto& recvAddr: recv) {
+      NFD_LOG_ERROR(recvAddr);
+    }
+
 
     // Create the neccessary thread to begin receving and transmitting
     pthread_t receive;
