@@ -14,6 +14,7 @@
 #include <queue>
 #include "pcap-helper.hpp"
 #include <fstream>
+#include <unordered_set>
 
 // Include the SX1272 and SPI library:
 #include "../../lora_libs/libraries/arduPiLoRa/arduPiLoRa.h"
@@ -86,8 +87,8 @@ private:
 
     // ID and connections used for implementing a network topology
     int id = 0;
-    int send = 0;
-    int recv = 0;
+    std::unordered_set<int> send = std::unordered_set<int>();
+    std::unordered_set<int> recv = std::unordered_set<int>();
 
     // Creating mutexes for shared queue and conditions for when data is produced from console
     pthread_mutex_t threadLock = PTHREAD_MUTEX_INITIALIZER; 

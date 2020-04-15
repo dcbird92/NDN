@@ -19,6 +19,7 @@ LoRaTransport::LoRaTransport() {
     if (readTopology) {
         std::ifstream infile(topologyFilename); 
         std::string token;
+        std::string value;
         while (std::getline(infile, token))
         {
           // Grab the ID field
@@ -31,14 +32,28 @@ LoRaTransport::LoRaTransport() {
           }
           // Grab the send field
           if (token.substr(0,4) == "send") {
-            send = token[5] - '0';
+            std::istringstream istr (token.substr(5));
+            while(std::getline(istr, value, ',')) {
+              NFD_LOG_ERROR("send");
+              NFD_LOG_ERROR(value);
+              send.insert(std::stoi(value));
+            }
           }
           // Grab the recv field
           if (token.substr(0,4) == "recv") {
-            recv = token[5] - '0';
+            std::istringstream istr (token.substr(5));
+            while(std::getline(istr, value, ',')) {
+              NFD_LOG_ERROR("recv");
+              NFD_LOG_ERROR(value);
+              recv.insert(std::stoi(value));
+            }
           }
         }
         NFD_LOG_ERROR("Read in topology");
+    }
+    else {
+      send.insert(0);
+      recv.insert(0);
     }
 
     // Create the neccessary thread to begin receving and transmitting
@@ -102,17 +117,22 @@ void LoRaTransport::sendPacket()
   }
   NFD_LOG_INFO("Message that is to be sent: " << sentStuff);
 
-  if ((nfd::face::LoRaTransport::e = sx1272.sendPacketTimeout(send, cstr, bufSize)) != 0)
-  {
-    NFD_LOG_ERROR("Send operation failed: " + std::to_string(e));
-  }
-  else
-  {
-    // print block size because we don't want to count the padding in buffer
-    NFD_LOG_INFO("Supposedly sent: " << bufSize << " bytes");
-    NFD_LOG_INFO("LoRa actually sent: " << sx1272._payloadlength << " _payloadlength bytes");
+  // Send to all the recepients that this message needs to be sent to
+  for (const auto& sendAddr: send) {
+    if ((nfd::face::LoRaTransport::e = sx1272.sendPacketTimeout(sendAddr, cstr, bufSize)) != 0)
+    {
+      NFD_LOG_ERROR("Send operation failed: " + std::to_string(e));
+    }
+    else
+    {
+      // print block size because we don't want to count the padding in buffer
+      NFD_LOG_INFO("Supposedly sent: " << bufSize << " bytes");
+      NFD_LOG_INFO("LoRa actually sent: " << sx1272._payloadlength << " _payloadlength bytes");
 
+    }
   }
+
+
 
   // Have to free all of this stuff
   delete[] cstr;
@@ -166,7 +186,7 @@ void LoRaTransport::handleRead() {
     if (e == 0) {
 
       // If we are using a certain network topology, make sure the dest and source is accepted
-      if (readTopology && sx1272.packet_received.dst != id && sx1272.packet_received.src != recv) {
+      if (readTopology && sx1272.packet_received.dst != id &&  recv.find(sx1272.packet_received.src) != recv.end()) {
         // Bad packet, try to read a different one
         NFD_LOG_ERROR("Dropping packet, bad dst or src");
         continue;
