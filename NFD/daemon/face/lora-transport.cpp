@@ -194,7 +194,7 @@ void LoRaTransport::handleRead() {
     if (e == 0) {
       NFD_LOG_INFO("Received packet from " << std::to_string(sx1272.packet_received.src) << " addr for dest " << std::to_string(sx1272.packet_received.dst) << " addr for id " << std::to_string(id));
       // If we are using a certain network topology, make sure the dest and source is accepted
-      if (readTopology && sx1272.packet_received.dst != id &&  recv.find(sx1272.packet_received.src) == recv.end()) {
+      if (readTopology && (sx1272.packet_received.dst != id ||  recv.find(sx1272.packet_received.src) == recv.end())) {
         // Bad packet, try to read a different one
         NFD_LOG_ERROR("Dropping packet, bad dst or src");
         dataToConsume = sx1272.checkForData();
