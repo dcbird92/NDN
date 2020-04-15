@@ -24,6 +24,10 @@ LoRaTransport::LoRaTransport() {
           // Grab the ID field
           if (token.substr(0,2) == "id") {
             id = token[3] - '0';
+            int err = sx1272.setNodeAddress(id);  // Set the ID so src in packets can be set
+            if (err != 0) {
+              NFD_LOG_ERROR("Unable to set nodeAddress! Fatal, restart");
+            }
           }
           // Grab the send field
           if (token.substr(0,4) == "send") {
@@ -98,7 +102,7 @@ void LoRaTransport::sendPacket()
   }
   NFD_LOG_INFO("Message that is to be sent: " << sentStuff);
 
-  if ((nfd::face::LoRaTransport::e = sx1272.sendPacketTimeout(0, cstr, bufSize)) != 0)
+  if ((nfd::face::LoRaTransport::e = sx1272.sendPacketTimeout(send, cstr, bufSize)) != 0)
   {
     NFD_LOG_ERROR("Send operation failed: " + std::to_string(e));
   }
@@ -154,14 +158,22 @@ void *LoRaTransport::transmit_and_recieve()
 void LoRaTransport::handleRead() {
   
   bool dataToConsume = true;
+  bool packetCreated = false;
   int i;
 
   while (dataToConsume) {
     e = sx1272.getPacket();
-    sx1272.getPayloadLength();
     if (e == 0) {
+
+      // If we are using a certain network topology, make sure the dest and source is accepted
+      if (readTopology && sx1272.packet_received.dst != id && sx1272.packet_received.src != recv) {
+        // Bad packet, try to read a different one
+        continue;
+      }
+
       NFD_LOG_INFO("\n\nData available to receive");
       int packetLength = (int)sx1272.getCurrentPacketLength();
+
       for (i = 0; i < packetLength; i++)
       {
           my_packet[i] = (char)sx1272.packet_received.data[i];
@@ -169,6 +181,7 @@ void LoRaTransport::handleRead() {
 
       // Reset null terminator
       my_packet[i] = '\0';
+      packetCreated = true;
       packetLength = i;
       NFD_LOG_INFO("Received packet:" << my_packet);
       NFD_LOG_INFO("With length:" << packetLength);
@@ -178,6 +191,11 @@ void LoRaTransport::handleRead() {
       return;
     }
     dataToConsume = sx1272.checkForData();
+  }
+
+  // If no viable packet was received, just exit
+  if (!packetCreated){
+    return;
   }
 
   NFD_LOG_INFO("i: " + std::to_string(i));
