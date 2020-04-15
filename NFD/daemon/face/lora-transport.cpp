@@ -21,8 +21,6 @@ LoRaTransport::LoRaTransport() {
         std::string token;
         while (std::getline(infile, token))
         {
-          NFD_LOG_ERROR(token.substr(0,2));
-          NFD_LOG_ERROR(token.substr(0,4));
           // Grab the ID field
           if (token.substr(0,2) == "id") {
             id = token[3] - '0';
@@ -32,8 +30,6 @@ LoRaTransport::LoRaTransport() {
           }
         }
         NFD_LOG_ERROR("Read in topology");
-        NFD_LOG_ERROR(std::to_string(id));
-        NFD_LOG_ERROR(std::to_string(conn));
     }
 
     // Create the neccessary thread to begin receving and transmitting
