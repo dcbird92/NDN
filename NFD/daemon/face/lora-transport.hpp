@@ -86,7 +86,8 @@ private:
 
     // ID and connections used for implementing a network topology
     int id = 0;
-    int conn = 0;
+    int send = 0;
+    int recv = 0;
 
     // Creating mutexes for shared queue and conditions for when data is produced from console
     pthread_mutex_t threadLock = PTHREAD_MUTEX_INITIALIZER; 

@@ -25,8 +25,13 @@ LoRaTransport::LoRaTransport() {
           if (token.substr(0,2) == "id") {
             id = token[3] - '0';
           }
-          if (token.substr(0,4) == "conn") {
-            conn = token[5] - '0';
+          // Grab the send field
+          if (token.substr(0,4) == "send") {
+            send = token[5] - '0';
+          }
+          // Grab the recv field
+          if (token.substr(0,4) == "recv") {
+            recv = token[5] - '0';
           }
         }
         NFD_LOG_ERROR("Read in topology");
