@@ -13,6 +13,7 @@
 #include <pthread.h>
 #include <queue>
 #include "pcap-helper.hpp"
+#include <fstream>
 
 // Include the SX1272 and SPI library:
 #include "../../lora_libs/libraries/arduPiLoRa/arduPiLoRa.h"
@@ -78,6 +79,14 @@ private:
     std::string m;
     char my_packet[2048];
     bool toSend;
+
+    // Flag used for reading in a certain network topology
+    bool readTopology = true;
+    std::string topologyFilename = "lora-configs/daisy-chain.topology";
+
+    // ID and connections used for implementing a network topology
+    int id = 0;
+    int conn = 0;
 
     // Creating mutexes for shared queue and conditions for when data is produced from console
     pthread_mutex_t threadLock = PTHREAD_MUTEX_INITIALIZER; 

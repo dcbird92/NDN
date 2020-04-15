@@ -14,6 +14,26 @@ LoRaTransport::LoRaTransport() {
     // Set all of the static variables associated with this transmission (just need to set MTU)
     this->setMtu(160);
 
+
+    // Read in a certain topology if flag is high
+    if (readTopology) {
+        std::ifstream infile(topologyFilename); 
+        std::string token;
+        while (std::getline(infile, token))
+        {
+          // Grab the ID field
+          if (token.substr(0,1) == std::string("id")) {
+            id = token[3] - '0';
+          }
+          if (token.substr(0,3) == std::string("conn")) {
+            conn = token[5] - '0';
+          }
+        }
+        NFD_LOG_ERROR("Read in topology");
+        NFD_LOG_ERROR(std::to_string(id));
+        NFD_LOG_ERROR(std::to_string(conn));
+    }
+
     // Create the neccessary thread to begin receving and transmitting
     pthread_t receive;
     int rc;
