@@ -40,7 +40,7 @@ LoRaFactory::doCreateFace(const CreateFaceRequest& req,
 {
 
   NFD_LOG_DEBUG("local " << req.localUri->getHost());
-  NFD_LOG_DEBUG("remote " << req.remoteUri->getHost());
+  NFD_LOG_DEBUG("remote " << req.remoteUri.getHost());
   for (const auto& i : m_channels) {
       i.second->createFace(req.params, onCreated);
       return;
