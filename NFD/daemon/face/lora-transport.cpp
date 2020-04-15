@@ -168,6 +168,7 @@ void LoRaTransport::handleRead() {
       // If we are using a certain network topology, make sure the dest and source is accepted
       if (readTopology && sx1272.packet_received.dst != id && sx1272.packet_received.src != recv) {
         // Bad packet, try to read a different one
+        NFD_LOG_ERROR("Dropping packet, bad dst or src");
         continue;
       }
 
