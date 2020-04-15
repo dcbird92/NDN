@@ -132,6 +132,7 @@ void LoRaTransport::sendPacket()
     }
     else
     {
+      NFD_LOG_INFO("sent to " << sendAddr);
       // print block size because we don't want to count the padding in buffer
       NFD_LOG_INFO("Supposedly sent: " << bufSize << " bytes");
       NFD_LOG_INFO("LoRa actually sent: " << sx1272._payloadlength << " _payloadlength bytes");
@@ -191,9 +192,9 @@ void LoRaTransport::handleRead() {
   while (dataToConsume) {
     e = sx1272.getPacket();
     if (e == 0) {
-
+      NFD_LOG_INFO("Received packet from " << sx1272.packet_received.src);
       // If we are using a certain network topology, make sure the dest and source is accepted
-      if (readTopology && sx1272.packet_received.dst != id &&  recv.find(sx1272.packet_received.src) != recv.end()) {
+      if (readTopology && sx1272.packet_received.dst != id &&  recv.find(sx1272.packet_received.src) == recv.end()) {
         // Bad packet, try to read a different one
         NFD_LOG_ERROR("Dropping packet, bad dst or src");
         continue;
