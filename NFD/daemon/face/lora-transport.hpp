@@ -100,7 +100,7 @@ private:
     std::queue<ndn::encoding::EncodingBuffer *> sendBufferQueue;
 
 public:
-    LoRaTransport();
+    LoRaTransport(std::string FaceURI);
 
 };
 
