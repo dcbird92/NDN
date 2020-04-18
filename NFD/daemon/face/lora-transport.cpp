@@ -14,8 +14,6 @@ LoRaTransport::LoRaTransport(std::string FaceURI) {
     // Set all of the static variables associated with this transmission (just need to set MTU)
     this->setMtu(160);
 
-    NFD_LOG_ERROR("transport faceURI" << FaceURI);
-
     // Read in a certain topology if flag is high
     if (readTopology) {
         std::ifstream infile(topologyFilename); 
