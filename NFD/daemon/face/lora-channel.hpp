@@ -54,7 +54,8 @@ public:
   LoRaChannel();
 
   void
-  createFace( const FaceParams& params,
+  createFace( const std::string FaceURI,
+              const FaceParams& params,
              const FaceCreatedCallback& onFaceCreated);
 
   bool
