@@ -43,9 +43,10 @@ LoRaChannel::LoRaChannel(){
 
 
 void
-LoRaChannel::createFace( const FaceParams& params,
+LoRaChannel::createFace( const std::string FaceURI, const FaceParams& params,
                        const FaceCreatedCallback& onFaceCreated)
 {
+  NFD_LOG_ERROR("URI" << FaceURI);
   shared_ptr<Face> face;
   setup();
   GenericLinkService::Options options;
