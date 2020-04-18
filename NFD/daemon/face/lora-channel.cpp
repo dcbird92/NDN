@@ -54,7 +54,7 @@ LoRaChannel::createFace( const std::string FaceURI, const FaceParams& params,
   options.allowReassembly = true;
   options.reliabilityOptions.isEnabled = params.wantLpReliability;
   auto linkService = make_unique<GenericLinkService>(options);
-  auto transport = make_unique<LoRaTransport>();
+  auto transport = make_unique<LoRaTransport>(FaceURI);
   face = make_shared<Face>(std::move(linkService), std::move(transport));
   
   m_channelFaces["default"] = face;
