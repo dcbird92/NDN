@@ -68,6 +68,11 @@ void LoRaTransport::doSend(const ndn::Block &packet, const EndpointId& endpoint)
   pthread_mutex_unlock(&threadLock);
 }
 
+void
+LoRaTransport::receiveData(ndn::Block data) {
+  this->receive(data);
+}
+
 void LoRaTransport::handleError(const std::string &errorMessage) {
   if (getPersistency() == ndn::nfd::FACE_PERSISTENCY_PERMANENT) {
     NFD_LOG_ERROR("Permanent face ignores error: " << errorMessage);

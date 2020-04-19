@@ -69,6 +69,9 @@ public:
     LoRaTransport(  std::queue<ndn::encoding::EncodingBuffer *>& packetQueue, 
                     pthread_mutex_t& queueMutex);
 
+    void
+    receiveData(ndn::Block data);
+
 };
 
 } // namespace face
