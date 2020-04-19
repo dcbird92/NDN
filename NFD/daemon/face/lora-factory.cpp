@@ -22,6 +22,7 @@ LoRaFactory::getId() noexcept
 LoRaFactory::LoRaFactory(const CtorParams& params)
   : ProtocolFactory(params)
 {
+  NFD_LOG_ERROR("Creating factory");
 }
 
 void
