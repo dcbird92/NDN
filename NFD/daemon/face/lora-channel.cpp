@@ -26,7 +26,6 @@
 #include "face.hpp"
 #include "generic-link-service.hpp"
 #include "common/global.hpp"
-#include "../../lora_libs/libraries/arduPiLoRa/arduPiLoRa.h"
 #include "lora-transport.hpp"
 #include "lora-channel.hpp"
 
@@ -47,7 +46,6 @@ LoRaChannel::createFace( const std::string FaceURI, const FaceParams& params,
                        const FaceCreatedCallback& onFaceCreated)
 {
   shared_ptr<Face> face;
-  setup();
   GenericLinkService::Options options;
   options.allowFragmentation = true;
   options.allowReassembly = true;
@@ -61,48 +59,6 @@ LoRaChannel::createFace( const std::string FaceURI, const FaceParams& params,
   // Need to invoke the callback regardless of whether or not we have already created
   // the face so that control responses and such can be sent.
   onFaceCreated(face);
-}
-
-void
-LoRaChannel::setup(){
-    // Print a start message
-  int e;
-  // Power ON the module
-  e = sx1272.ON();
-
-  // Set transmission mode
-  //e = sx1272.setMode(4);
-  
-  
-  //Set Operating Parameters Coding Rate CR, Bandwidth BW, and Spreading Factor SF
-  
-  e = sx1272.setCR(CR_5);
-  e = sx1272.setBW(BW_500);
-  e = sx1272.setSF(SF_7);
-
-  // Set header
-  e = sx1272.setHeaderON();
-
-  // Select frequency channel
-  e = sx1272.setChannel(CH_00_900);
-
-  // Set CRC
-  e = sx1272.setCRC_ON();
-
-  // Select output power (Max, High or Low)
-  e = sx1272.setPower('H');
-
-  // Set the node address
-  e = sx1272.setNodeAddress(3);
-
-  // Set the LoRa into receive mode by default
-  e = sx1272.receive();
-  if (e)
-    NFD_LOG_CHAN_DEBUG("Unable to enter receive mode");
-
-  // Print a success message
-  NFD_LOG_CHAN_DEBUG("SX1272 successfully configured\n\n");
-  delay(1000);
 }
 
 }

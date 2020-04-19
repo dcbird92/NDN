@@ -35,7 +35,7 @@ public:
    *         is thrown if it cannot be created.
    * \throw LoRaFactory::Error
    */
-  shared_ptr<LoRaChannel>
+  std::shared_ptr<LoRaChannel>
   createChannel();
 
 
@@ -51,20 +51,15 @@ private:
                const FaceCreatedCallback& onCreated,
                const FaceCreationFailedCallback& onFailure) override;
 
-  std::vector<shared_ptr<const Channel>>
+  std::vector<std::shared_ptr<const Channel>>
   doGetChannels() const override;
 
 
 private:
-  bool m_wantCongestionMarking = false;
-  std::map<std::string, shared_ptr<LoRaChannel>> m_channels;
+  std::map<std::string, std::shared_ptr<LoRaChannel>> m_channels;
 
-  signal::ScopedConnection m_netifAddConn;
-  struct NetifConns
-  {
-    signal::ScopedConnection addrAddConn;
-  };
-  std::map<int, NetifConns> m_netifConns; // ifindex => signal connections
+  void
+  setup();
 
 };
 

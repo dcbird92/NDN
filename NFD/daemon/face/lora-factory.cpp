@@ -3,7 +3,7 @@
 #include "lora-factory.hpp"
 #include "generic-link-service.hpp"
 #include "common/global.hpp"
-
+#include "../../lora_libs/libraries/arduPiLoRa/arduPiLoRa.h"
 
 namespace nfd {
 namespace face {
@@ -22,7 +22,8 @@ LoRaFactory::getId() noexcept
 LoRaFactory::LoRaFactory(const CtorParams& params)
   : ProtocolFactory(params)
 {
-  NFD_LOG_ERROR("Creating factory");
+  // Start the lora interface
+    setup();
 }
 
 void
@@ -49,7 +50,7 @@ LoRaFactory::doCreateFace(const CreateFaceRequest& req,
   onFailure(504, "No LoRa available to connect");
 }
 
-shared_ptr<LoRaChannel>
+std::shared_ptr<LoRaChannel>
 LoRaFactory::createChannel()
 {
   auto it = m_channels.find("default");
@@ -61,10 +62,50 @@ LoRaFactory::createChannel()
   return channel;
 }
 
-std::vector<shared_ptr<const Channel>>
+std::vector<std::shared_ptr<const Channel>>
 LoRaFactory::doGetChannels() const
 {
   return getChannelsFromMap(m_channels);
+}
+
+
+void
+LoRaFactory::setup(){
+    // Print a start message
+  int e;
+  // Power ON the module
+  e = sx1272.ON();
+
+  // Set transmission mode
+  //e = sx1272.setMode(4);
+  
+  
+  //Set Operating Parameters Coding Rate CR, Bandwidth BW, and Spreading Factor SF
+  
+  e = sx1272.setCR(CR_5);
+  e = sx1272.setBW(BW_500);
+  e = sx1272.setSF(SF_7);
+
+  // Set header
+  e = sx1272.setHeaderON();
+
+  // Select frequency channel
+  e = sx1272.setChannel(CH_00_900);
+
+  // Set CRC
+  e = sx1272.setCRC_ON();
+
+  // Select output power (Max, High or Low)
+  e = sx1272.setPower('H');
+
+  // Set the LoRa into receive mode by default
+  e = sx1272.receive();
+  if (e)
+    NFD_LOG_INFO("Unable to enter receive mode");
+
+  // Print a success message
+  NFD_LOG_INFO("SX1272 successfully configured\n\n");
+  delay(1000);
 }
 
 } // namespace face

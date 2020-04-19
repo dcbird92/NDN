@@ -71,8 +71,6 @@ public:
   }
 
 private:
-  void
-  setup();
   std::map<std::string, shared_ptr<Face>> m_channelFaces;
   size_t m_size;
 
