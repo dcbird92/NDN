@@ -44,22 +44,40 @@ void
 LoRaChannel::createFace(std::queue<ndn::encoding::EncodingBuffer *>& sendBufferQueue, 
                         pthread_mutex_t& queueMutex,
                         const FaceParams& params,
-                        const FaceCreatedCallback& onFaceCreated)
+                        const FaceCreatedCallback& onFaceCreated,
+                        const FaceCreationFailedCallback& onFailure)
 {
-  shared_ptr<Face> face;
-  GenericLinkService::Options options;
-  options.allowFragmentation = true;
-  options.allowReassembly = true;
-  options.reliabilityOptions.isEnabled = params.wantLpReliability;
-  auto linkService = make_unique<GenericLinkService>(options);
-  auto transport = make_unique<LoRaTransport>(sendBufferQueue, queueMutex);
-  face = make_shared<Face>(std::move(linkService), std::move(transport));
-  
-  m_channelFaces["default"] = face;
+  try
+  {
+    std::shared_ptr<Face> face;
+    // Create the link service (we want to include fragmentation)
+    GenericLinkService::Options options;
+    options.allowFragmentation = true;
+    options.allowReassembly = true;
+    options.reliabilityOptions.isEnabled = params.wantLpReliability;
+    auto linkService = make_unique<GenericLinkService>(options);
 
-  // Need to invoke the callback regardless of whether or not we have already created
-  // the face so that control responses and such can be sent.
-  onFaceCreated(face);
+    // Create the transport alyer associated with this channel
+    auto transport = make_unique<LoRaTransport>(sendBufferQueue, queueMutex);
+
+    // Create the face with this link service and transport layer (default face since each
+    // channel will just have 1 face, due to their only being 1 protocol for LoRa)
+    face = make_shared<Face>(std::move(linkService), std::move(transport));
+    m_channelFaces["default"] = face;
+    // Created successfully
+    onFaceCreated(face);
+  }
+  catch(const std::exception& e)
+  {
+    onFailure(504, "Unable to create transport and link service: " << e.what());
+  }
+}
+
+void
+LoRaChannel::handleReceive(ndn::Block data){
+  auto it = m_channelFaces.find("default");   // Change this if there multiple faces to a channel for lora
+  auto face = it->second;
+  face->receive(data);
 }
 
 }

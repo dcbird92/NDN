@@ -294,16 +294,28 @@ LoRaFactory::handleRead() {
   }
   NFD_LOG_INFO("Packet ascii:" << gotStuff);
 
-  // try
-  // {
-  //   ndn::Block element = ndn::Block((uint8_t*)my_packet, i);
-  //   this->receive(element);
-  //   NFD_LOG_INFO("Created block succesfully and called receive");
-  // }
-  // catch(const std::exception& e)
-  // {
-  //   NFD_LOG_ERROR("Block create exception: " << e.what());
-  // }
+  try
+  {
+    ndn::Block element = ndn::Block((uint8_t*)my_packet, i);
+    // See what unicast faces want this data
+    for (const auto& i : m_channels) {
+      std::size_t position = i.first.find('-');
+      // Check to see if the connection ID matches src, if it does pass the data to this face
+      std::string rightIDString = i.first.substr(position+1);
+      if (std::stoi(rightIDString) == sx1272.packet_received.src) {
+        i.second->handleReceive(element);
+      }
+    }
+    // Pass to all broadcast channels
+    for (const auto& i : mcast_channels) {
+      i.second->handleReceive(element);
+    }
+    NFD_LOG_INFO("Created block succesfully and called receive");
+  }
+  catch(const std::exception& e)
+  {
+    NFD_LOG_ERROR("Block create exception: " << e.what());
+  }
 } 
 
 } // namespace face

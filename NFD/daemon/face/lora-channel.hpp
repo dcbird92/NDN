@@ -58,7 +58,8 @@ public:
   createFace( std::queue<ndn::encoding::EncodingBuffer *>& sendBufferQueue,
               pthread_mutex_t& queueMutex,
               const FaceParams& params,
-              const FaceCreatedCallback& onFaceCreated);
+              const FaceCreatedCallback& onFaceCreated,
+              const FaceCreationFailedCallback& onFailure);
 
   bool
   isListening() const override
@@ -71,6 +72,9 @@ public:
   {
     return m_size;
   }
+
+  void
+  handleReceive(ndn::Block);
 
 private:
   std::map<std::string, shared_ptr<Face>> m_channelFaces;
