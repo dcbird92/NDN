@@ -41,8 +41,9 @@ LoRaChannel::LoRaChannel(std::string URI){
 
 
 void
-LoRaChannel::createFace(std::queue<ndn::encoding::EncodingBuffer *>& sendBufferQueue, 
+LoRaChannel::createFace(std::queue<std::pair<std::pair<uint8_t, uint8_t>*, ndn::encoding::EncodingBuffer *>>, 
                         pthread_mutex_t& queueMutex,
+                        std::pair<uint8_t, uint8_t>* ids
                         const FaceParams& params,
                         const FaceCreatedCallback& onFaceCreated,
                         const FaceCreationFailedCallback& onFailure)
@@ -58,7 +59,7 @@ LoRaChannel::createFace(std::queue<ndn::encoding::EncodingBuffer *>& sendBufferQ
     auto linkService = make_unique<GenericLinkService>(options);
 
     // Create the transport alyer associated with this channel
-    auto transport = make_unique<LoRaTransport>(sendBufferQueue, queueMutex);
+    auto transport = make_unique<LoRaTransport>(ids, sendBufferQueue, queueMutex);
 
     // Create the face with this link service and transport layer (default face since each
     // channel will just have 1 face, due to their only being 1 protocol for LoRa)

@@ -57,16 +57,17 @@ private:
     std::string topologyFilename = "/home/pi/NDN/lora-configs/daisy-chain.topology";
 
     // ID and connections used for implementing a network topology
-    int id = 0;
+    std::pair<uint8_t, uint8_t>* idAndSendAddr;
     std::unordered_set<uint8_t> send = std::unordered_set<uint8_t>();
     std::unordered_set<uint8_t> recv = std::unordered_set<uint8_t>();
 
     // Block to store stuff in
-    std::queue<ndn::encoding::EncodingBuffer *> sendBufferQueue;
+    std::queue<std::pair<std::pair<uint8_t, uint8_t>*, ndn::encoding::EncodingBuffer *>> sendBufferQueue;
     pthread_mutex_t threadLock;
 
 public:
-    LoRaTransport(  std::queue<ndn::encoding::EncodingBuffer *>& packetQueue, 
+    LoRaTransport(  std::pair<uint8_t, uint8_t>* ids,
+                    std::queue<std::pair<std::pair<uint8_t, uint8_t>*, ndn::encoding::EncodingBuffer *>>& packetQueue, 
                     pthread_mutex_t& queueMutex);
 
     void

@@ -9,7 +9,8 @@ namespace face {
 
 NFD_LOG_INIT(LoRaTransport);
 
-LoRaTransport::LoRaTransport(std::queue<ndn::encoding::EncodingBuffer *>& packetQueue, 
+LoRaTransport::LoRaTransport(std::pair<uint8_t, uint8_t>* ids,
+                            std::queue<std::pair<std::pair<uint8_t, uint8_t>*, ndn::encoding::EncodingBuffer *>>& packetQueue, 
                             pthread_mutex_t& queueMutex) {
 
     // Set all of the static variables associated with this transmission (just need to set MTU)
@@ -24,7 +25,7 @@ LoRaTransport::LoRaTransport(std::queue<ndn::encoding::EncodingBuffer *>& packet
         {
           // Grab the ID field
           if (token.substr(0,2) == "id") {
-            id = token[3] - '0';
+            int id = token[3] - '0';
             int err = sx1272.setNodeAddress(id);  // Set the ID so src in packets can be set
             if (err != 0) {
               NFD_LOG_ERROR("Unable to set nodeAddress! Fatal, restart");
@@ -62,6 +63,7 @@ void LoRaTransport::doClose() {
 
 void LoRaTransport::doSend(const ndn::Block &packet, const EndpointId& endpoint) {
   // Set the flag high that we have a packet to transmit, and push the new data onto the queue
+  // std::make_pair(std::make_pair(-1L,-1L),std::make_pair(0L,0L))
   pthread_mutex_lock(&threadLock);
   sendBufferQueue.push(new ndn::EncodingBuffer(packet));
   NFD_LOG_FACE_TRACE("Send item added to queue");

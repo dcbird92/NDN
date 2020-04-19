@@ -72,6 +72,7 @@ LoRaFactory::doCreateFace(const CreateFaceRequest& req,
       // If the URI contains a '-', we know its a unicast face
       if (URI.find('-') != std::string::npos) {
         auto channel = createChannel(URI);
+        std::pair<uint8_t, uint8_t> sendIDAndConnID = std::make_pair()
         channel->createFace(sendBufferQueue, threadLock, req.params, onCreated, onFailure);
       }
       // Otherwise its a multicast face (broadcast)
@@ -219,20 +220,20 @@ LoRaFactory::sendPacket()
   NFD_LOG_INFO("Message that is to be sent: " << sentStuff);
 
   // Send to all the recepients that this message needs to be sent to
-  // for (const auto& sendAddr: send) {
-  //   if ((e = sx1272.sendPacketTimeout(sendAddr, cstr, bufSize)) != 0)
-  //   {
-  //     NFD_LOG_ERROR("Send operation failed: " + std::to_string(e));
-  //   }
-  //   else
-  //   {
-  //     NFD_LOG_INFO("sent to " << std::to_string(sendAddr));
-  //     // print block size because we don't want to count the padding in buffer
-  //     NFD_LOG_INFO("Supposedly sent: " << bufSize << " bytes");
-  //     NFD_LOG_INFO("LoRa actually sent: " << sx1272._payloadlength << " _payloadlength bytes");
+  for (const auto& sendAddr: send) {
+    if ((e = sx1272.sendPacketTimeout(sendAddr, cstr, bufSize)) != 0)
+    {
+      NFD_LOG_ERROR("Send operation failed: " + std::to_string(e));
+    }
+    else
+    {
+      NFD_LOG_INFO("sent to " << std::to_string(sendAddr));
+      // print block size because we don't want to count the padding in buffer
+      NFD_LOG_INFO("Supposedly sent: " << bufSize << " bytes");
+      NFD_LOG_INFO("LoRa actually sent: " << sx1272._payloadlength << " _payloadlength bytes");
 
-  //   }
-  // }
+    }
+  }
 
   // Have to free all of this stuff
   delete[] cstr;
@@ -249,14 +250,6 @@ LoRaFactory::handleRead() {
   while (dataToConsume) {
     e = sx1272.getPacket();
     if (e == 0) {
-      // NFD_LOG_INFO("Received packet from " << std::to_string(sx1272.packet_received.src) << " addr for dest " << std::to_string(sx1272.packet_received.dst) << " addr for id " << std::to_string(id));
-      // // If we are using a certain network topology, make sure the dest and source is accepted (0 is broadcast)
-      // if ((sx1272.packet_received.dst != 0 && sx1272.packet_received.dst != id) ||  (recv.find(0) == recv.end() || recv.find(sx1272.packet_received.src) == recv.end())) {
-      //   // Bad packet, try to read a different one
-      //   NFD_LOG_ERROR("Dropping packet, bad dst or src");
-      //   dataToConsume = sx1272.checkForData();
-      //   continue;
-      // }
 
       NFD_LOG_INFO("\n\nData available to receive");
       int packetLength = (int)sx1272.getCurrentPacketLength();
@@ -306,13 +299,17 @@ LoRaFactory::handleRead() {
       std::string connIDString = i.first.substr(position+1);
       NFD_LOG_ERROR("id " << idString);
       NFD_LOG_ERROR("connID " << connIDString);
-      if (std::stoi(connIDString) == sx1272.packet_received.src) {
+      if (std::stoi(connIDString) == sx1272.packet_received.src && (std::stoi(idString) == sx1272.packet_received.dst || sx1272.packet_received.dst == BROADCAST_0)) {
         i.second->handleReceive(element);
       }
     }
-    // Pass to all broadcast channels
+    // Pass to all broadcast channels with the right source
+    // lora://<id>
     for (const auto& i : mcast_channels) {
-      i.second->handleReceive(element);
+      std::string idString = i.first.substr(7);
+      if (std::stoi(idString) == sx1272.packet_received.dst || sx1272.packet_received.dst == BROADCAST_0) {
+        i.second->handleReceive(element);
+      }
     }
     NFD_LOG_INFO("Created block succesfully and called receive");
   }

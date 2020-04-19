@@ -55,8 +55,9 @@ public:
   LoRaChannel(std::string URI);
 
   void
-  createFace( std::queue<ndn::encoding::EncodingBuffer *>& sendBufferQueue,
+  createFace( std::queue<std::pair<std::pair<uint8_t, uint8_t>*, ndn::encoding::EncodingBuffer *>>& sendBufferQueue,
               pthread_mutex_t& queueMutex,
+              std::pair<uint8_t, uint8_t> ids,
               const FaceParams& params,
               const FaceCreatedCallback& onFaceCreated,
               const FaceCreationFailedCallback& onFailure);
