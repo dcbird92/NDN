@@ -78,8 +78,8 @@ LoRaChannel::createFace(std::queue<ndn::encoding::EncodingBuffer *>& sendBufferQ
 void
 LoRaChannel::handleReceive(ndn::Block data){
   auto it = m_channelFaces.find("default");   // Change this if there multiple faces to a channel for lora
-  auto transport = it->second->getTransport();
-  transport->receiveData(data);
+  // static_cast<WebSocketTransport*>(it->second->getTransport())->receiveMessage(msg->get_payload());
+  static_cast<LoRaTransport*>(it->second->getTransport())->receiveData(data);
 }
 
 }
