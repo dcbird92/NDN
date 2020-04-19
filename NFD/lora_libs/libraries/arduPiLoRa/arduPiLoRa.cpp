@@ -3242,25 +3242,11 @@ boolean	SX1272::availableData()
 boolean SX1272::checkForData()
 {
 	byte value;
-	byte header = 0;
 	value = readRegister(REG_IRQ_FLAGS);
 
 	// Checks the header for a received packet
 	if( bitRead(value, 4) == 1 ) {
-		while( (header == 0) && (millis() - previous < (unsigned long)wait) )
-		{ // Waiting to read first payload bytes from packet
-			header = readRegister(REG_FIFO_RX_BYTE_ADDR);
-				delay(1000);
-			// Condition to avoid an overflow (DO NOT REMOVE)
-			if( millis() < previous )
-			{
-				previous = millis();
-			}
-		}
-		if( header != 0 )
-		{ // Reading first byte of the received packet
-			_destination = readRegister(REG_FIFO);
-		}
+		return true;
 	}
 	return false;
 }
