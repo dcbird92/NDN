@@ -610,7 +610,6 @@ public:
       try
       {
         int id = std::stoi(faceUri.getHost());
-
         // Can only have IDs that are 0-255 (must be represented as a byte)
         if (id > 255 || id < 0) {
           return false;
@@ -632,6 +631,7 @@ public:
            boost::asio::io_service& io, time::nanoseconds timeout) const override
   {
     if (this->isCanonical(faceUri)){
+      onFailure("cannot canonize " + faceUri.getHost());
       onSuccess(faceUri);
     }
     else {
