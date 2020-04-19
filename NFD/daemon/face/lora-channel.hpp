@@ -27,7 +27,8 @@
 #define NFD_DAEMON_FACE_LORA_CHANNEL_HPP
 
 #include "channel.hpp"
-
+#include <queue>
+#include <pthread.h>
 
  namespace nfd {
 namespace face {
@@ -54,9 +55,10 @@ public:
   LoRaChannel(std::string URI);
 
   void
-  createFace( const std::string FaceURI,
+  createFace( std::queue<ndn::encoding::EncodingBuffer *>& sendBufferQueue,
+              std::pthread_mutex_t& queueMutex,
               const FaceParams& params,
-             const FaceCreatedCallback& onFaceCreated);
+              const FaceCreatedCallback& onFaceCreated);
 
   bool
   isListening() const override

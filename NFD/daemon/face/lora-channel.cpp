@@ -29,7 +29,6 @@
 #include "lora-transport.hpp"
 #include "lora-channel.hpp"
 
-
 namespace nfd {
 namespace face {
 
@@ -42,8 +41,10 @@ LoRaChannel::LoRaChannel(std::string URI){
 
 
 void
-LoRaChannel::createFace( const std::string FaceURI, const FaceParams& params,
-                       const FaceCreatedCallback& onFaceCreated)
+LoRaChannel::createFace(std::queue<ndn::encoding::EncodingBuffer *>& sendBufferQueue, 
+                        std::pthread_mutex_t& queueMutex,
+                        const FaceParams& params,
+                        const FaceCreatedCallback& onFaceCreated)
 {
   shared_ptr<Face> face;
   GenericLinkService::Options options;
@@ -51,7 +52,7 @@ LoRaChannel::createFace( const std::string FaceURI, const FaceParams& params,
   options.allowReassembly = true;
   options.reliabilityOptions.isEnabled = params.wantLpReliability;
   auto linkService = make_unique<GenericLinkService>(options);
-  auto transport = make_unique<LoRaTransport>(FaceURI);
+  auto transport = make_unique<LoRaTransport>(sendBufferQueue, queueMutex);
   face = make_shared<Face>(std::move(linkService), std::move(transport));
   
   m_channelFaces["default"] = face;

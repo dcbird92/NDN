@@ -23,6 +23,15 @@ public:
   explicit
   LoRaFactory(const CtorParams& params);
 
+    /*
+    * @brief Helper funnction used for passing this along with pthread to spawn a thread. Otherwise compilation errors
+    * https://stackoverflow.com/questions/1151582/pthread-function-from-a-class
+    * */
+    static void *transmit_and_receive_helper(void *context)
+    {
+        return ((LoRaFactory *)context)->transmit_and_recieve();
+    }
+
   using ProtocolFactory::ProtocolFactory;
 
   /**
@@ -65,6 +74,17 @@ private:
   std::vector<std::shared_ptr<const Channel>>
   doGetChannels() const override;
 
+  /**
+   * @brief Sends the specified TLV block on the network wrapped in an Ethernet frame
+   */
+  void
+  sendPacket();
+  
+  /**
+   * Handle incoming data received on the lora module 
+  */
+  void
+  handleRead();
 
 private:
   // Map for storing all the unicast channels
@@ -75,6 +95,22 @@ private:
 
   void
   setup();
+
+  // Spawn transmit an receive threads used for lora
+  void
+  *transmit_and_recieve();
+
+  // Used for lora
+  int e;
+  std::string m;
+  char my_packet[2048];
+  bool toSend;
+
+  // Creating mutexes for shared queue and conditions for when data is produced from console
+  pthread_mutex_t threadLock = PTHREAD_MUTEX_INITIALIZER; 
+
+  // Queue used to send messages out through LoRa
+  std::queue<ndn::encoding::EncodingBuffer *> sendBufferQueue;
 
 };
 

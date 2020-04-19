@@ -38,15 +38,6 @@ class LoRaTransport : public Transport
     void
     receivePayload();
 
-    /*
-    * @brief Helper funnction used for passing this along with pthread to spawn a thread. Otherwise compilation errors
-    * https://stackoverflow.com/questions/1151582/pthread-function-from-a-class
-    * */
-    static void *transmit_and_receive_helper(void *context)
-    {
-        return ((LoRaTransport *)context)->transmit_and_recieve();
-    }
-
 protected:
 
     void
@@ -54,33 +45,13 @@ protected:
 
 private:
     void
-    doSend(const ndn::Block &packet, const EndpointId& endpoint) final;
-
-    /**
-   * @brief Sends the specified TLV block on the network wrapped in an Ethernet frame
-   */
-    void
-    sendPacket();
-
-    void
-    asyncRead();
-
-    void
-    handleRead();
+    doSend(const Block &packet, const EndpointId& endpoint) final;
 
     void
     handleError(const std::string &errorMessage);
 
-    void
-    *transmit_and_recieve();
-
 // Variables
 private:
-    int e;
-    std::string m;
-    char my_packet[2048];
-    bool toSend;
-
     // Flag used for reading in a certain network topology
     bool readTopology = false;
     std::string topologyFilename = "/home/pi/NDN/lora-configs/daisy-chain.topology";
@@ -90,17 +61,15 @@ private:
     std::unordered_set<uint8_t> send = std::unordered_set<uint8_t>();
     std::unordered_set<uint8_t> recv = std::unordered_set<uint8_t>();
 
-    // Creating mutexes for shared queue and conditions for when data is produced from console
-    pthread_mutex_t threadLock = PTHREAD_MUTEX_INITIALIZER; 
-    pthread_cond_t dataSent = PTHREAD_COND_INITIALIZER; 
-
     // Block to store stuff in
     const ndn::Block *store_packet;
     ndn::encoding::EncodingBuffer *sendBuffer;
     std::queue<ndn::encoding::EncodingBuffer *> sendBufferQueue;
+    pthread_mutex_t threadLock;
 
 public:
-    LoRaTransport(std::string FaceURI);
+    LoRaTransport(  std::queue<ndn::encoding::EncodingBuffer *>& packetQueue, 
+                    std::pthread_mutex_t& queueMutex);
 
 };
 
