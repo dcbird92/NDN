@@ -54,6 +54,9 @@ LoRaTransport::LoRaTransport(std::string FaceURI) {
       // Grab this lora modules ID and who it can send/receive with
       std::string leftIDString = FaceURI.substr(0, position);
       std::string rightIDString = FaceURI.substr(position+1);
+      NFD_LOG_ERROR("transport");
+      NFD_LOG_ERROR(leftIDString);
+      NFD_LOG_ERROR(rightIDString);
       id = std::stoi(leftIDString);
       int connID = std::stoi(rightIDString);
       send.insert(connID);
