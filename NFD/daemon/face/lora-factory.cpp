@@ -56,7 +56,7 @@ LoRaFactory::doCreateFace(const CreateFaceRequest& req,
   }
   catch(const std::exception& e)
   {
-      onFailure(504, "Unable to create LoRa face: " << e.what());
+      onFailure(504, e.what());
   }
 }
 
