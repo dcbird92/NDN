@@ -104,7 +104,6 @@ private:
   int e;
   std::string m;
   char my_packet[2048];
-  bool toSend;
 
   // Creating mutexes for shared queue and conditions for when data is produced from console
   pthread_mutex_t threadLock = PTHREAD_MUTEX_INITIALIZER; 
