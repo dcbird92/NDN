@@ -14,7 +14,7 @@ LoRaTransport::LoRaTransport(std::string FaceURI) {
     // Set all of the static variables associated with this transmission (just need to set MTU)
     this->setMtu(160);
 
-    // Read in a certain topology if flag is high
+    // Read in a certain topology if flag is high (can add certain other LoRa IDs to send to and recv from)
     if (readTopology) {
         std::ifstream infile(topologyFilename); 
         std::string token;
@@ -44,23 +44,27 @@ LoRaTransport::LoRaTransport(std::string FaceURI) {
             }
           }
         }
-        NFD_LOG_ERROR("Read in topology");
+        NFD_LOG_INFO("Read in topology");
+    }
+
+    // Read the ID and connection IDs from the FaceURI string (taken in from commandline)
+    // These fields have already been validated in face-uri.cpp, so no need for try-catch
+    std::size_t position = FaceURI.find('-');
+    if (position != std::string::npos) {
+      // Grab this lora modules ID and who it can send/receive with
+      std::string leftIDString = FaceURI.substr(0, position);
+      std::string rightIDString = FaceURI.substr(position+1);
+      id = std::stoi(leftIDString);
+      int connID = std::stoi(rightIDString);
+      send.insert(connID);
+      recv.insert(connID);
     }
     else {
+      // Grab the ID, broadcasting mode so add 0 to send/recv 
+      id = std::stoi(FaceURI);
       send.insert(0);
       recv.insert(0);
     }
-
-    NFD_LOG_ERROR("Send contains:");
-    for (const auto& sendAddr: send) {
-      NFD_LOG_ERROR(std::to_string(sendAddr));
-    }
-
-    NFD_LOG_ERROR("Recv contains:");
-    for (const auto& recvAddr: recv) {
-      NFD_LOG_ERROR(std::to_string(recvAddr));
-    }
-
 
     // Create the neccessary thread to begin receving and transmitting
     pthread_t receive;
@@ -79,7 +83,7 @@ void LoRaTransport::doClose() {
   this->setState(TransportState::FAILED);
 }
 
-void LoRaTransport::doSend(const Block &packet, const EndpointId& endpoint) {
+void LoRaTransport::doSend(const ndn::Block &packet) {
   // Set the flag high that we have a packet to transmit, and push the new data onto the queue
   pthread_mutex_lock(&threadLock);
   sendBufferQueue.push(new ndn::EncodingBuffer(packet));
@@ -192,8 +196,8 @@ void LoRaTransport::handleRead() {
     e = sx1272.getPacket();
     if (e == 0) {
       NFD_LOG_INFO("Received packet from " << std::to_string(sx1272.packet_received.src) << " addr for dest " << std::to_string(sx1272.packet_received.dst) << " addr for id " << std::to_string(id));
-      // If we are using a certain network topology, make sure the dest and source is accepted
-      if (readTopology && (sx1272.packet_received.dst != id ||  recv.find(sx1272.packet_received.src) == recv.end())) {
+      // If we are using a certain network topology, make sure the dest and source is accepted (0 is broadcast)
+      if ((sx1272.packet_received.dst != 0 && sx1272.packet_received.dst != id) ||  (recv.find(0) == recv.end() || recv.find(sx1272.packet_received.src) == recv.end())) {
         // Bad packet, try to read a different one
         NFD_LOG_ERROR("Dropping packet, bad dst or src");
         dataToConsume = sx1272.checkForData();
@@ -232,7 +236,7 @@ void LoRaTransport::handleRead() {
   auto gotStuff = std::string();
   for(int idx = 0; idx < i; idx++)
   {
-    gotStuff += to_string((int)my_packet[idx]);
+    gotStuff += std::to_string((int)my_packet[idx]);
   }
   NFD_LOG_INFO("Packet ascii:" << gotStuff);
 

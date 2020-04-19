@@ -54,7 +54,7 @@ protected:
 
 private:
     void
-    doSend(const Block &packet, const EndpointId& endpoint) final;
+    doSend(const ndn::Block &packet) final;
 
     /**
    * @brief Sends the specified TLV block on the network wrapped in an Ethernet frame
@@ -82,7 +82,7 @@ private:
     bool toSend;
 
     // Flag used for reading in a certain network topology
-    bool readTopology = true;
+    bool readTopology = false;
     std::string topologyFilename = "/home/pi/NDN/lora-configs/daisy-chain.topology";
 
     // ID and connections used for implementing a network topology
@@ -95,7 +95,7 @@ private:
     pthread_cond_t dataSent = PTHREAD_COND_INITIALIZER; 
 
     // Block to store stuff in
-    const Block *store_packet;
+    const ndn::Block *store_packet;
     ndn::encoding::EncodingBuffer *sendBuffer;
     std::queue<ndn::encoding::EncodingBuffer *> sendBufferQueue;
 
