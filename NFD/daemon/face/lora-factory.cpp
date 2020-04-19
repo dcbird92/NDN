@@ -39,26 +39,53 @@ LoRaFactory::doCreateFace(const CreateFaceRequest& req,
                          const FaceCreatedCallback& onCreated,
                          const FaceCreationFailedCallback& onFailure)
 {
-
+  std::string URI = req.remoteUri.toString();
   try
-  {
-      for (const auto& i : m_channels) {
+  { 
+      std::map<std::string, std::shared_ptr<LoRaChannel>> channels;
+      // unicast
+      if (URI.find('-') != std::string::npos) {
+        channels = m_channels;
+      }
+      else {
+        channels = mcast_channels;
+      }
+      for (const auto& i : channels) {
         // Found a channel already created
         if (i.first == req.remoteUri.toString()) {
-          const std::string retStr = "Face already exists for " + req.remoteUri.toString();
+          const std::string retStr = "Face already exists for " + URI;
           onFailure(504, retStr);
           return;
         }
       }
 
-      // Otherwise create a channel for this new request and a face associated with it
-      auto channel = createChannel(req.remoteUri.toString());
-      channel->createFace(req.remoteUri.getHost(), req.params, onCreated);
+      // Otherwise create a channel for this new request and a face associated with it (either unicast or multicast)
+      // If the URI contains a '-', we know its a unicast face
+      if (URI.find('-') != std::string::npos) {
+        auto channel = createChannel(URI);
+        channel->createFace(req.remoteUri.getHost(), req.params, onCreated);
+      }
+      // Otherwise its a multicast face (broadcast)
+      else {
+        auto channel = 
+      }
+
   }
   catch(const std::exception& e)
   {
       onFailure(504, e.what());
   }
+}
+
+std::shared_ptr<LoRaChannel>
+LoRaFactory::createMultiCastChannel(std::string URI) {
+  auto it = mcast_channels.find(URI);
+  if (it != mcast_channels.end())
+    return it->second;
+
+  auto channel = std::make_shared<LoRaChannel>(URI);
+  mcast_channels[URI] = channel;
+  return channel;
 }
 
 std::shared_ptr<LoRaChannel>

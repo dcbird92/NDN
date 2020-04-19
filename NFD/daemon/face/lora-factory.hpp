@@ -38,6 +38,17 @@ public:
   std::shared_ptr<LoRaChannel>
   createChannel(std::string URI);
 
+    /**
+   * \brief Create LoRa-based multi-cast (broadcast) channel
+   *
+   *
+   * \return always a valid pointer to a LoRaChannel object, an exception
+   *         is thrown if it cannot be created.
+   * \throw LoRaFactory::Error
+   */
+  std::shared_ptr<LoRaChannel>
+  createMultiCastChannel(std::string URI);
+
 
 private:
   /** \brief process face_system.udp config section
@@ -56,7 +67,11 @@ private:
 
 
 private:
+  // Map for storing all the unicast channels
   std::map<std::string, std::shared_ptr<LoRaChannel>> m_channels;
+
+  // Map for storing all the multicast channels
+  std::map<std::string, std::shared_ptr<LoRaChannel>> mcast_channels;
 
   void
   setup();
