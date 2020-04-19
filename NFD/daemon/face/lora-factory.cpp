@@ -44,7 +44,7 @@ LoRaFactory::doCreateFace(const CreateFaceRequest& req,
   {
       for (const auto& i : m_channels) {
         // Found a channel already created
-        if (i.first == req.remoteUri.getHost()) {
+        if (i.first == req.remoteUri.toString()) {
           NFD_LOG_INFO("Face already exists for " << req.remoteUri.toString());
           return;
         }
