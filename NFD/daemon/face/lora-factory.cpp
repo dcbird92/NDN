@@ -32,7 +32,7 @@ LoRaFactory::doProcessConfig(OptionalConfigSection configSection,
 {
     this->createChannel();
     providedSchemes.insert("lora");
-    NFD_LOG_TRACE("Lora Process Config");
+    NFD_LOG_INFO("Lora Process Config");
 }
 
 void
@@ -104,7 +104,7 @@ LoRaFactory::setup(){
     NFD_LOG_INFO("Unable to enter receive mode");
 
   // Print a success message
-  NFD_LOG_INFO("SX1272 successfully configured\n\n");
+  NFD_LOG_INFO("SX1272 successfully configured");
   delay(1000);
 }
 
