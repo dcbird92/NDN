@@ -46,7 +46,7 @@ LoRaFactory::doCreateFace(const CreateFaceRequest& req,
         // Found a channel already created
         if (i.first == req.remoteUri.toString()) {
           const std::string retStr = "Face already exists for " + req.remoteUri.toString();
-          onFailure(retStr);
+          onFailure(504, retStr);
           return;
         }
       }
