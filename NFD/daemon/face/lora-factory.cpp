@@ -178,7 +178,7 @@ void *LoRaFactory::transmit_and_recieve()
     pthread_mutex_unlock(&threadLock);
 
     // Check to see if the LoRa has received data... if so handle it (0ms wait for data, just checks once)
-    if (sx1272.availableData(0)) {
+    if (sx1272.checkForData()) {
       handleRead();
     }
   }
@@ -300,9 +300,13 @@ LoRaFactory::handleRead() {
     // See what unicast faces want this data
     for (const auto& i : m_channels) {
       std::size_t position = i.first.find('-');
-      // Check to see if the connection ID matches src, if it does pass the data to this face
-      std::string rightIDString = i.first.substr(position+1);
-      if (std::stoi(rightIDString) == sx1272.packet_received.src) {
+      // Check to see if the connection ID matches src, if it does pass the data to this face. Also if ID matches
+      // lora://<id>-<connID>
+      std::string idString = i.first.substr(7, position - 7);
+      std::string connIDString = i.first.substr(position+1);
+      NFD_LOG_ERROR("id " << idString);
+      NFD_LOG_ERROR("connID " << connIDString);
+      if (std::stoi(connIDString) == sx1272.packet_received.src) {
         i.second->handleReceive(element);
       }
     }
