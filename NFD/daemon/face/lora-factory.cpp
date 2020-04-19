@@ -40,7 +40,7 @@ LoRaFactory::doCreateFace(const CreateFaceRequest& req,
 {
 
   for (const auto& i : m_channels) {
-      i.second->createFace(req.remoteUri.toString(), req.params, onCreated);
+      i.second->createFace(req.remoteUri.getHost(), req.params, onCreated);
       return;
     }
 
