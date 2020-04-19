@@ -23,15 +23,15 @@ LoRaFactory::LoRaFactory(const CtorParams& params)
   : ProtocolFactory(params)
 {
   // Start the lora interface
-    setup();
+  setup();
+  providedSchemes.insert("lora");
 }
 
 void
 LoRaFactory::doProcessConfig(OptionalConfigSection configSection,
                             FaceSystem::ConfigContext& context)
 {
-    providedSchemes.insert("lora");
-    NFD_LOG_INFO("Lora Process Config");
+    // Not implemented yet! Implement if time
 }
 
 void
