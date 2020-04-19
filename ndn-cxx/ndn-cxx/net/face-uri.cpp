@@ -631,7 +631,6 @@ public:
            boost::asio::io_service& io, time::nanoseconds timeout) const override
   {
     if (this->isCanonical(faceUri)){
-      onFailure("cannot canonize " + faceUri.getHost());
       onSuccess(faceUri);
     }
     else {
