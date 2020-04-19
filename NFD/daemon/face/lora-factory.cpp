@@ -67,7 +67,8 @@ LoRaFactory::doCreateFace(const CreateFaceRequest& req,
       }
       // Otherwise its a multicast face (broadcast)
       else {
-        auto channel = 
+        auto channel = createMultiCastChannel(URI);
+        channel->createFace(req.remoteUri.getHost(), req.params, onCreated);
       }
 
   }
