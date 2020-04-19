@@ -44,7 +44,8 @@ LoRaFactory::doCreateFace(const CreateFaceRequest& req,
   for (const auto& i : m_channels) {
       // Found a channel already created
       if (i.first == req.remoteUri.getHost()) {
-        
+        NFD_LOG_INFO("Face already exists for " << req.remoteUri.toString());
+        return;
       }
       // i.second->createFace(req.remoteUri.getHost(), req.params, onCreated);
       // return;
@@ -58,13 +59,13 @@ LoRaFactory::doCreateFace(const CreateFaceRequest& req,
 }
 
 std::shared_ptr<LoRaChannel>
-LoRaFactory::createChannel()
+LoRaFactory::createChannel(std::string URI)
 {
-  auto it = m_channels.find("default");
+  auto it = m_channels.find(URI);
   if (it != m_channels.end())
     return it->second;
 
-  auto channel = std::make_shared<LoRaChannel>();
+  auto channel = std::make_shared<LoRaChannel>(URI);
   m_channels["default"] = channel;
   return channel;
 }

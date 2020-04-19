@@ -36,7 +36,7 @@ public:
    * \throw LoRaFactory::Error
    */
   std::shared_ptr<LoRaChannel>
-  createChannel();
+  createChannel(std::string URI);
 
 
 private:

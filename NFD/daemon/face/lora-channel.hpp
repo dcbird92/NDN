@@ -51,7 +51,7 @@ public:
     }
   };
 
-  LoRaChannel();
+  LoRaChannel(std::string URI);
 
   void
   createFace( const std::string FaceURI,

@@ -35,8 +35,8 @@ namespace face {
 
 NFD_LOG_INIT(LoRaChannel);
 
-LoRaChannel::LoRaChannel(){
-  setUri(FaceUri());
+LoRaChannel::LoRaChannel(std::string URI){
+  setUri(ndn::FaceUri(URI));
   NFD_LOG_CHAN_INFO("Creating channel");
 }
 
