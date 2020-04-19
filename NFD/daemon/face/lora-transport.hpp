@@ -54,7 +54,7 @@ protected:
 
 private:
     void
-    doSend(const ndn::Block &packet) final;
+    doSend(const ndn::Block &packet, const EndpointId& endpoint) final;
 
     /**
    * @brief Sends the specified TLV block on the network wrapped in an Ethernet frame

@@ -83,7 +83,7 @@ void LoRaTransport::doClose() {
   this->setState(TransportState::FAILED);
 }
 
-void LoRaTransport::doSend(const ndn::Block &packet) {
+void LoRaTransport::doSend(const ndn::Block &packet, const EndpointId& endpoint) {
   // Set the flag high that we have a packet to transmit, and push the new data onto the queue
   pthread_mutex_lock(&threadLock);
   sendBufferQueue.push(new ndn::EncodingBuffer(packet));
