@@ -69,7 +69,8 @@ LoRaChannel::createFace(std::queue<ndn::encoding::EncodingBuffer *>& sendBufferQ
   }
   catch(const std::exception& e)
   {
-    onFailure(504, "Unable to create transport and link service: " << e.what());
+    std::string failMsg = "Unable to create transport and link service: " + e.what();
+    onFailure(504, failMsg);
   }
 }
 
