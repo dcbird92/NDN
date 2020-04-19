@@ -101,7 +101,7 @@ public: // scheme-specific construction
 
   /// create dev FaceUri for LoRa device
   static FaceUri
-  fromLora();
+  fromLora(const std::string& idConnections);
 
   /// create udp4 or udp6 NIC-associated FaceUri from endpoint and network device name
   static FaceUri

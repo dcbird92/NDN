@@ -175,11 +175,11 @@ FaceUri::fromDev(const std::string& ifname)
 }
 
 FaceUri
-FaceUri::fromLora()
+FaceUri::fromLora(const std::string& idConnections)
 {
   FaceUri uri;
   uri.m_scheme = "lora";
-  uri.m_host = "1";
+  uri.m_host = "";
   return uri;
 }
 
@@ -579,9 +579,49 @@ public:
     return {"lora"};
   }
 
+  // Lora URIs need to either be scheme://id (which then broadcasts all signals) or scheme://id-conn (where only sends to conn, which as an ID of another lora module)
   bool
   isCanonical(const FaceUri& faceUri) const override
   {
+    // Look for a hyphen
+    std::size_t position = faceUri.getHost().find('-');
+    if (position != std::string::npos) {
+      // Make sure there is an ID left of and right of of the hyphen
+      try
+      {
+        std::string leftIDString = faceUri.getHost().substr(0, position);
+        std::string rightIDString = faceUri.getHost().substr(position+1);
+        int leftID = std::stoi(leftIDString);
+        int rightID = std::stoi(rightIDString);
+
+        // Can only have IDs that are 0-255 (must be represented as a byte)
+        if ((leftID > 255 || leftID < 0) || (rightID > 255 || rightID < 0)) {
+          return false;
+        }
+      }
+      catch(const std::exception& e)
+      {
+        return false;
+      }
+      
+    }
+    else {
+      // Make sure one ID is contained
+      try
+      {
+        int id = std::stoi(faceUri.getHost());
+
+        // Can only have IDs that are 0-255 (must be represented as a byte)
+        if (id > 255 || id < 0) {
+          return false;
+        }
+      }
+      catch(const std::exception& e)
+      {
+        return false;
+      }
+      
+    }
     return true;
   }
 
@@ -591,10 +631,12 @@ public:
            const FaceUri::CanonizeFailureCallback& onFailure,
            boost::asio::io_service& io, time::nanoseconds timeout) const override
   {
-    // No need to check anything, since LoRa doesn't need a host right now. Just for broadcasting purposes only
-    FaceUri canonicalUri = FaceUri::fromLora();
-    BOOST_ASSERT(canonicalUri.isCanonical());
-    onSuccess(canonicalUri);
+    if (this->isCanonical(faceUri)){
+      onSuccess(faceUri);
+    }
+    else {
+      onFailure("cannot canonize " + faceUri.getHost());
+    }
   }
 };
 
