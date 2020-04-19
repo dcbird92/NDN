@@ -69,7 +69,7 @@ private:
 
 public:
     LoRaTransport(  std::queue<ndn::encoding::EncodingBuffer *>& packetQueue, 
-                    std::pthread_mutex_t& queueMutex);
+                    pthread_mutex_t& queueMutex);
 
 };
 

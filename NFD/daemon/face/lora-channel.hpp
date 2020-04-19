@@ -56,7 +56,7 @@ public:
 
   void
   createFace( std::queue<ndn::encoding::EncodingBuffer *>& sendBufferQueue,
-              std::pthread_mutex_t& queueMutex,
+              pthread_mutex_t& queueMutex,
               const FaceParams& params,
               const FaceCreatedCallback& onFaceCreated);
 

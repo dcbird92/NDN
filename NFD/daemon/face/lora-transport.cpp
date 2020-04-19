@@ -10,7 +10,7 @@ namespace face {
 NFD_LOG_INIT(LoRaTransport);
 
 LoRaTransport::LoRaTransport(std::queue<ndn::encoding::EncodingBuffer *>& packetQueue, 
-                            std::pthread_mutex_t& queueMutex) {
+                            pthread_mutex_t& queueMutex) {
 
     // Set all of the static variables associated with this transmission (just need to set MTU)
     this->setMtu(160);
@@ -86,7 +86,6 @@ void LoRaTransport::doSend(const ndn::Block &packet, const EndpointId& endpoint)
   // Set the flag high that we have a packet to transmit, and push the new data onto the queue
   pthread_mutex_lock(&threadLock);
   sendBufferQueue.push(new ndn::EncodingBuffer(packet));
-  toSend = true;
   NFD_LOG_INFO("\n\ndoSend: added item to queue, set toSend true");
   pthread_mutex_unlock(&threadLock);
 
