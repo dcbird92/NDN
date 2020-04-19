@@ -111,6 +111,7 @@ private:
 
   // Queue used to send messages out through LoRa
   std::queue<ndn::encoding::EncodingBuffer *> sendBufferQueue;
+  ndn::encoding::EncodingBuffer *sendBuffer;
 
 };
 

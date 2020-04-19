@@ -62,8 +62,6 @@ private:
     std::unordered_set<uint8_t> recv = std::unordered_set<uint8_t>();
 
     // Block to store stuff in
-    const ndn::Block *store_packet;
-    ndn::encoding::EncodingBuffer *sendBuffer;
     std::queue<ndn::encoding::EncodingBuffer *> sendBufferQueue;
     pthread_mutex_t threadLock;
 

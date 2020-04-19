@@ -72,12 +72,12 @@ LoRaFactory::doCreateFace(const CreateFaceRequest& req,
       // If the URI contains a '-', we know its a unicast face
       if (URI.find('-') != std::string::npos) {
         auto channel = createChannel(URI);
-        channel->createFace(req.remoteUri.getHost(), req.params, onCreated);
+        channel->createFace(sendBufferQueue, threadLock, req.params, onCreated);
       }
       // Otherwise its a multicast face (broadcast)
       else {
         auto channel = createMultiCastChannel(URI);
-        channel->createFace(req.remoteUri.getHost(), req.params, onCreated);
+        channel->createFace(sendBufferQueue, threadLock, req.params, onCreated);
       }
 
   }
