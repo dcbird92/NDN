@@ -77,8 +77,8 @@ LoRaChannel::createFace(std::queue<ndn::encoding::EncodingBuffer *>& sendBufferQ
 void
 LoRaChannel::handleReceive(ndn::Block data){
   auto it = m_channelFaces.find("default");   // Change this if there multiple faces to a channel for lora
-  auto face = it->second;
-  face->receive(data);
+  auto transport = it->second->getTransport();
+  transport->receive(data);
 }
 
 }
