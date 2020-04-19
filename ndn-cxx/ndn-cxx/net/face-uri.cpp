@@ -49,7 +49,15 @@ FaceUri::FaceUri()
 
 FaceUri::FaceUri(const std::string& uri)
 {
-  if (!parse(uri)) {
+  // Check for lora://<host>, since it isn't parsed like IP addresses. Already checked for validity by face-uri.cpp
+  if (uri.substr(0, 4) == "lora") {
+    m_scheme = "lora";
+    m_host = uri.substr(7); // Grab everything after lora://
+    m_isV6 = false;
+    m_port.clear();
+    m_path.clear();
+  }
+  else if (!parse(uri)) {
     NDN_THROW(Error("Malformed URI: " + uri));
   }
 }

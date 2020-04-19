@@ -42,9 +42,16 @@ LoRaFactory::doCreateFace(const CreateFaceRequest& req,
 {
 
   for (const auto& i : m_channels) {
-      i.second->createFace(req.remoteUri.getHost(), req.params, onCreated);
-      return;
-    }
+      // Found a channel already created
+      if (i.first == req.remoteUri.getHost()) {
+        
+      }
+      // i.second->createFace(req.remoteUri.getHost(), req.params, onCreated);
+      // return;
+  }
+
+  // Otherwise create a channel for this new request
+  
 
   NFD_LOG_TRACE("No LoRas available to connect to ");
   onFailure(504, "No LoRa available to connect");
