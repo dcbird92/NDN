@@ -594,8 +594,8 @@ public:
         int leftID = std::stoi(leftIDString);
         int rightID = std::stoi(rightIDString);
 
-        // Can only have IDs that are 0-255 (must be represented as a byte)
-        if ((leftID > 255 || leftID < 0) || (rightID > 255 || rightID < 0)) {
+        // Can only have IDs that are 0-255 (must be represented as a byte) and they cann't be equal (can't send to same module)
+        if ((leftID > 255 || leftID < 0) || (rightID > 255 || rightID < 0) || (rightID != leftID)) {
           return false;
         }
       }
