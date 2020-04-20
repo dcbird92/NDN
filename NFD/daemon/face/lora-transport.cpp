@@ -56,9 +56,6 @@ LoRaTransport::LoRaTransport(std::pair<uint8_t, uint8_t> ids,
 }
 
 void LoRaTransport::doClose() {
-  // Close this form of transmission by turning off the chip
-  sx1272.OFF();
-
   this->setState(TransportState::FAILED);
 }
 
