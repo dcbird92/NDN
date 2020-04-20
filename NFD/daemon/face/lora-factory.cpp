@@ -252,11 +252,11 @@ LoRaFactory::sendPacket()
       }
       NFD_LOG_INFO("Message that is to be sent: " << sentStuff);
 
-      std::pair<uint8_t, uint8_t>* ids = queueElement->first;
-      NFD_LOG_INFO("grabbed ids");
-      uint8_t id = ids->first;
-      NFD_LOG_INFO("id" << std::to_string(id));
-      uint8_t dst = ids->second;
+      // std::pair<uint8_t, uint8_t>* ids = queueElement->first;
+      // NFD_LOG_INFO("grabbed ids");
+      // uint8_t id = ids->first;
+      // NFD_LOG_INFO("id" << std::to_string(id));
+      // uint8_t dst = ids->second;
       NFD_LOG_INFO("dst" << std::to_string(dst));
       // Set LoRa source, send to dst
       if ((e = sx1272.setNodeAddress(1)) != 0) {
