@@ -52,7 +52,7 @@ LoRaTransport::LoRaTransport(std::pair<uint8_t, uint8_t> ids,
     // Save the queue and mutex so we can add messages, so ultimately the lora module can send them
     sendBufferQueue = packetQueue;
     threadLock = queueMutex;
-    idAndSendAddr = ids;
+    idAndSendAddr = std::make_pair(ids.first, ids.second);
 }
 
 void LoRaTransport::doClose() {
@@ -66,6 +66,7 @@ void LoRaTransport::doSend(const ndn::Block &packet, const EndpointId& endpoint)
   // Set the flag high that we have a packet to transmit, and push the new data onto the queue
   // std::make_pair(std::make_pair(-1L,-1L),std::make_pair(0L,0L))
   pthread_mutex_lock(threadLock);
+  NFD_LOG_INFO("sending to: " << std::to_string(idAndSendAddr.second) << " from " << std::to_string(idAndSendAddr.first) << " TRANSPORT");
   ndn::encoding::EncodingBuffer *toSendBuff = new ndn::EncodingBuffer(packet);
   std::pair<std::pair<uint8_t, uint8_t>*, ndn::encoding::EncodingBuffer *> pairToPush = std::make_pair(&idAndSendAddr, toSendBuff);
   sendBufferQueue->push(&pairToPush);
