@@ -183,7 +183,7 @@ void *LoRaFactory::transmit_and_recieve()
     if (sx1272.receive() != 0) {
       NFD_LOG_ERROR("unable to enter receive");
     }
-    
+
     pthread_mutex_unlock(&threadLock);
 
     // Check to see if the LoRa has received data... if so handle it (0ms wait for data, just checks once)
@@ -251,6 +251,7 @@ LoRaFactory::sendPacket()
     // print block size because we don't want to count the padding in buffer
     NFD_LOG_INFO("Supposedly sent: " << bufSize << " bytes");
     NFD_LOG_INFO("LoRa actually sent: " << sx1272._payloadlength << " _payloadlength bytes");
+    NFD_LOG_INFO("src ");
 
   }
 
