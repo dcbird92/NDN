@@ -11,7 +11,7 @@ NFD_LOG_INIT(LoRaTransport);
 
 LoRaTransport::LoRaTransport(std::pair<uint8_t, uint8_t> ids,
                             std::queue<std::pair<std::pair<uint8_t, uint8_t>*, ndn::encoding::EncodingBuffer *>*>* packetQueue, 
-                            pthread_mutex_t& queueMutex) {
+                            pthread_mutex_t* queueMutex) {
 
     // Set all of the static variables associated with this transmission (just need to set MTU)
     this->setMtu(160);
