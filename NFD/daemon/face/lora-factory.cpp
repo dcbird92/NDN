@@ -214,18 +214,27 @@ LoRaFactory::sendPacket()
 {
   try
   {
+      // Grab queue item
       std::pair<std::pair<uint8_t, uint8_t>*, ndn::encoding::EncodingBuffer *>* queueElement = sendBufferQueue.front();
       if (queueElement == nullptr) {
         NFD_LOG_ERROR("Passed a null queue item to send, not sending");
         return;
       }
+
+      // Grab encoding to send from queue item
       sendBuffer = queueElement->second;
-      // int bufSize = sendBuffer->size();
-      // if (bufSize <= 0)
-      // {
-      //   NFD_LOG_ERROR("Trying to send a packet with no size");
-      //   return;
-      // }
+      if (sendBuffer == nullptr) {
+        NFD_LOG_ERROR("Passed a null encoding to send, not sending");
+        return;
+      }
+
+      // Check the size of the encoding
+      int bufSize = sendBuffer->size();
+      if (bufSize <= 0)
+      {
+        NFD_LOG_ERROR("Trying to send a packet with no size");
+        return;
+      }
 
       // NFD_LOG_INFO("Packet size to be sent: " << bufSize);
 
