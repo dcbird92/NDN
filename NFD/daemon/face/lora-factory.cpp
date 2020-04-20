@@ -218,7 +218,6 @@ LoRaFactory::sendPacket()
   {
       std::pair<std::pair<uint8_t, uint8_t>*, ndn::encoding::EncodingBuffer *>* queueElement = sendBufferQueue.front(); 
       sendBufferQueue.pop();
-      sendBuffer = queueElement->second;
       int bufSize = sendBuffer->size();
       if (bufSize <= 0)
       {
