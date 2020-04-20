@@ -149,6 +149,9 @@ LoRaFactory::setup(){
   if (e)
     NFD_LOG_INFO("Error configuring LoRa");
 
+  // Set the node address
+  e = sx1272.setNodeAddress(3);
+  
   // Set header
   e = sx1272.setHeaderON();
   if (e)
