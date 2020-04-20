@@ -63,7 +63,7 @@ private:
 
     // Block to store stuff in
     std::queue<std::pair<std::pair<uint8_t, uint8_t>*, ndn::encoding::EncodingBuffer *>*>* sendBufferQueue;
-    pthread_mutex_t threadLock;
+    pthread_mutex_t* threadLock;
 
 public:
     LoRaTransport(  std::pair<uint8_t, uint8_t> ids,
