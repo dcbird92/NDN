@@ -244,13 +244,19 @@ LoRaFactory::sendPacket()
 
       // Used for debugging
       auto sentStuff = std::string();
-      for(int idx = 0; idx < bufSize; idx++)
+      for (int idx = 0; idx < bufSize; idx++)
       {
         sentStuff += std::to_string((int)cstr[idx]) + ", ";
       }
       NFD_LOG_DEBUG("Message that is to be sent: " << sentStuff);
 
-      // std::pair<uint8_t, uint8_t>* ids = queueElement->first;
+      // Now grab src and dst IDs from queue item
+      std::pair<uint8_t, uint8_t>* ids = queueElement->first;
+      if (ids == nullptr) {
+        NFD_LOG_ERROR("Passed a null pair of ids, not sending");
+        return;
+      }
+      
       // NFD_LOG_INFO("grabbed ids");
       // uint8_t id = ids->first;
       // NFD_LOG_INFO("id" << std::to_string(id));
