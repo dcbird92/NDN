@@ -185,6 +185,7 @@ void *LoRaFactory::transmit_and_recieve()
             // sendBuffer = sendBufferQueue.front()->second;
             // sendBufferQueue.pop();
             sendPacket();
+            sendBufferQueue.pop();
             toSend = sendBufferQueue.empty() == false;
           }
 
