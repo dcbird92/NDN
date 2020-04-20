@@ -181,9 +181,6 @@ void *LoRaFactory::transmit_and_recieve()
         bool toSend = sendBufferQueue.size() > 0;
         if (toSend) {
           while(toSend) {
-            // NFD_LOG_INFO("toSend is true");
-            // sendBuffer = sendBufferQueue.front()->second;
-            // sendBufferQueue.pop();
             sendPacket();
             sendBufferQueue.pop();
             toSend = sendBufferQueue.empty() == false;
@@ -217,7 +214,11 @@ LoRaFactory::sendPacket()
 {
   try
   {
-      // std::pair<std::pair<uint8_t, uint8_t>*, ndn::encoding::EncodingBuffer *>* queueElement = sendBufferQueue.front(); 
+      std::pair<std::pair<uint8_t, uint8_t>*, ndn::encoding::EncodingBuffer *>* queueElement = sendBufferQueue.front();
+      if (queueElement == nullptr) {
+        NFD_LOG_ERROR("Passed a null queue item to send, not sending");
+        return;
+      }
       // sendBufferQueue.pop();
       // int bufSize = sendBuffer->size();
       // if (bufSize <= 0)
