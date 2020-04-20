@@ -56,7 +56,7 @@ LoRaTransport::LoRaTransport(std::pair<uint8_t, uint8_t> ids,
 }
 
 void LoRaTransport::doClose() {
-  this->setState(TransportState::FAILED);
+  // this->setState(TransportState::FAILED);
 }
 
 void LoRaTransport::doSend(const ndn::Block &packet, const EndpointId& endpoint) {
