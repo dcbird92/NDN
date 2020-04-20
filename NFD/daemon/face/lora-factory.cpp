@@ -235,8 +235,6 @@ LoRaFactory::sendPacket()
         return;
       }
 
-      // NFD_LOG_INFO("Packet size to be sent: " << bufSize);
-
       // copy the buffer into a cstr so we can send it
       char *cstr = new char[bufSize];
       int i = 0;
@@ -244,15 +242,13 @@ LoRaFactory::sendPacket()
         cstr[i++] = ptr;
       }
 
-      // if (i != bufSize)
-      //   NFD_LOG_ERROR("Sizes different. i: " << i << " bufSize: " << bufSize);
-
-      // auto sentStuff = std::string();
-      // for(int idx = 0; idx < bufSize; idx++)
-      // {
-      //   sentStuff += std::to_string((int)cstr[idx]) + ", ";
-      // }
-      // NFD_LOG_INFO("Message that is to be sent: " << sentStuff);
+      // Used for debugging
+      auto sentStuff = std::string();
+      for(int idx = 0; idx < bufSize; idx++)
+      {
+        sentStuff += std::to_string((int)cstr[idx]) + ", ";
+      }
+      NFD_LOG_DEBUG("Message that is to be sent: " << sentStuff);
 
       // std::pair<uint8_t, uint8_t>* ids = queueElement->first;
       // NFD_LOG_INFO("grabbed ids");
