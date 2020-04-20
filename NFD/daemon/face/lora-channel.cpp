@@ -43,7 +43,7 @@ LoRaChannel::LoRaChannel(std::string URI){
 void
 LoRaChannel::createFace(std::queue<std::pair<std::pair<uint8_t, uint8_t>*, ndn::encoding::EncodingBuffer *>*>* sendBufferQueue,
                         pthread_mutex_t* queueMutex,
-                        std::pair<uint8_t, uint8_t>* ids,
+                        std::pair<uint8_t, uint8_t> ids,
                         const FaceParams& params,
                         const FaceCreatedCallback& onFaceCreated,
                         const FaceCreationFailedCallback& onFailure)
@@ -79,7 +79,6 @@ LoRaChannel::createFace(std::queue<std::pair<std::pair<uint8_t, uint8_t>*, ndn::
 void
 LoRaChannel::handleReceive(ndn::Block data){
   auto it = m_channelFaces.find("default");   // Change this if there multiple faces to a channel for lora
-  // static_cast<WebSocketTransport*>(it->second->getTransport())->receiveMessage(msg->get_payload());
   static_cast<LoRaTransport*>(it->second->getTransport())->receiveData(data);
 }
 
