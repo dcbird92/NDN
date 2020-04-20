@@ -174,8 +174,6 @@ void *LoRaFactory::transmit_and_recieve()
     pthread_mutex_lock(&threadLock);
     // Check and see if there is something to send
     if(sendBufferQueue.size() > 0) {
-      sendBuffer = sendBufferQueue.front();
-      sendBufferQueue.pop();
       sendPacket();
     }
 
@@ -193,6 +191,9 @@ void *LoRaFactory::transmit_and_recieve()
 void
 LoRaFactory::sendPacket()
 {
+  std::pair<std::pair<uint8_t, uint8_t>*, ndn::encoding::EncodingBuffer *>* queueElement = sendBufferQueue.front(); 
+  sendBufferQueue.pop();
+  sendBuffer = queueElement->second;
   int bufSize = sendBuffer->size();
   if (bufSize <= 0)
   {
@@ -224,20 +225,22 @@ LoRaFactory::sendPacket()
   }
   NFD_LOG_INFO("Message that is to be sent: " << sentStuff);
 
-  // Send to all the recepients that this message needs to be sent to
-  for (const auto& sendAddr: send) {
-    if ((e = sx1272.sendPacketTimeout(sendAddr, cstr, bufSize)) != 0)
-    {
-      NFD_LOG_ERROR("Send operation failed: " + std::to_string(e));
-    }
-    else
-    {
-      NFD_LOG_INFO("sent to " << std::to_string(sendAddr));
-      // print block size because we don't want to count the padding in buffer
-      NFD_LOG_INFO("Supposedly sent: " << bufSize << " bytes");
-      NFD_LOG_INFO("LoRa actually sent: " << sx1272._payloadlength << " _payloadlength bytes");
+  std::pair<uint8_t, uint8_t>* ids = queueElement->first;
+  uint8_t id = ids->first;
+  uint8_t dst = ids->second;
+  // Set LoRa source, send to dst
+  sx1272.setNodeAddress(id);
+  if ((e = sx1272.sendPacketTimeout(dst, cstr, bufSize)) != 0)
+  {
+    NFD_LOG_ERROR("Send operation failed: " + std::to_string(e));
+  }
+  else
+  {
+    NFD_LOG_INFO("sent to " << std::to_string(dst) << " from " << std::to_string(id));
+    // print block size because we don't want to count the padding in buffer
+    NFD_LOG_INFO("Supposedly sent: " << bufSize << " bytes");
+    NFD_LOG_INFO("LoRa actually sent: " << sx1272._payloadlength << " _payloadlength bytes");
 
-    }
   }
 
   // Have to free all of this stuff
