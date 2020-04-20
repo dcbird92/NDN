@@ -56,6 +56,7 @@ LoRaTransport::LoRaTransport(std::pair<uint8_t, uint8_t> ids,
 }
 
 void LoRaTransport::doClose() {
+  NFD_LOG_INFO("Closiung LoRaTransport!");
   // this->setState(TransportState::FAILED);
 }
 
