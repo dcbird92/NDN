@@ -189,15 +189,15 @@ void *LoRaFactory::transmit_and_recieve()
         // Alternate between sending and receiving, so sending doesn't starve receive thread
         // pthread_mutex_lock(&threadLock);
         // Check and see if there is something to send
-        if(sendBufferQueue.size() > 0) {
-          sendPacket();
-          NFD_LOG_INFO("sent!!!!!!!!");
-        }
+        // if(sendBufferQueue.size() > 0) {
+        //   sendPacket();
+        //   NFD_LOG_INFO("sent!!!!!!!!");
+        // }
 
-        // After sending enter recieve mode again
-        if (sx1272.receive() != 0) {
-          NFD_LOG_ERROR("unable to enter receive");
-        }
+        // // After sending enter recieve mode again
+        // if (sx1272.receive() != 0) {
+        //   NFD_LOG_ERROR("unable to enter receive");
+        // }
 
         // pthread_mutex_unlock(&threadLock);
 
