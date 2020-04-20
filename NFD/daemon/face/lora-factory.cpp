@@ -230,8 +230,7 @@ LoRaFactory::sendPacket()
 
       // Check the size of the encoding
       int bufSize = sendBuffer->size();
-      if (bufSize <= 0)
-      {
+      if (bufSize <= 0) {
         NFD_LOG_ERROR("Trying to send a packet with no size");
         return;
       }
@@ -241,8 +240,7 @@ LoRaFactory::sendPacket()
       // copy the buffer into a cstr so we can send it
       char *cstr = new char[bufSize];
       int i = 0;
-      for (auto ptr : *sendBuffer)
-      {
+      for (auto ptr : *sendBuffer) {
         cstr[i++] = ptr;
       }
 
