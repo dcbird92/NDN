@@ -191,6 +191,7 @@ void *LoRaFactory::transmit_and_recieve()
         // Check and see if there is something to send
         if(sendBufferQueue.size() > 0) {
           sendPacket();
+          NFD_LOG_INFO("sent!!!!!!!!");
         }
 
         // After sending enter recieve mode again
