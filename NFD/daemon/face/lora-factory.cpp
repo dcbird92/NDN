@@ -268,7 +268,7 @@ LoRaFactory::sendPacket()
       }
       else
       {
-        NFD_LOG_INFO("sent to " << std::to_string(dst) << " from " << std::to_string(id));
+        // NFD_LOG_INFO("sent to " << std::to_string(dst) << " from " << std::to_string(id));
         // print block size because we don't want to count the padding in buffer
         NFD_LOG_INFO("Supposedly sent: " << bufSize << " bytes");
         NFD_LOG_INFO("LoRa actually sent: " << sx1272._payloadlength << " _payloadlength bytes");
