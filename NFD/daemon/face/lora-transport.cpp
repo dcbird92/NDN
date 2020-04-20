@@ -66,14 +66,14 @@ void LoRaTransport::doSend(const ndn::Block &packet, const EndpointId& endpoint)
   // Set the flag high that we have a packet to transmit, and push the new data onto the queue
   try
   {
-      pthread_mutex_lock(threadLock);
+      // pthread_mutex_lock(threadLock);
       NFD_LOG_INFO("sending to: " << std::to_string(idAndSendAddr.second) << " from " << std::to_string(idAndSendAddr.first) << " TRANSPORT");
       ndn::encoding::EncodingBuffer *toSendBuff = new ndn::EncodingBuffer(packet);
       NFD_LOG_INFO("created packet");
       std::pair<std::pair<uint8_t, uint8_t>*, ndn::encoding::EncodingBuffer *> pairToPush = std::make_pair(&idAndSendAddr, toSendBuff);
       sendBufferQueue->push(&pairToPush);
       NFD_LOG_INFO("Send item added to queue");
-      pthread_mutex_unlock(threadLock);
+      // pthread_mutex_unlock(threadLock);
   }
   catch(const std::exception& e)
   {

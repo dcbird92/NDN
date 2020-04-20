@@ -187,7 +187,7 @@ void *LoRaFactory::transmit_and_recieve()
       while(true){
 
         // Alternate between sending and receiving, so sending doesn't starve receive thread
-        pthread_mutex_lock(&threadLock);
+        // pthread_mutex_lock(&threadLock);
         // Check and see if there is something to send
         if(sendBufferQueue.size() > 0) {
           sendPacket();
@@ -198,7 +198,7 @@ void *LoRaFactory::transmit_and_recieve()
           NFD_LOG_ERROR("unable to enter receive");
         }
 
-        pthread_mutex_unlock(&threadLock);
+        // pthread_mutex_unlock(&threadLock);
 
         // Check to see if the LoRa has received data... if so handle it (0ms wait for data, just checks once)
         if (sx1272.checkForData()) {
