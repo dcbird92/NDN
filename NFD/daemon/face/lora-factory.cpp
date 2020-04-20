@@ -84,6 +84,7 @@ LoRaFactory::doCreateFace(const CreateFaceRequest& req,
         auto channel = createMultiCastChannel(URI);
         uint8_t id = std::stoi(URI.substr(7));
         std::pair<uint8_t, uint8_t> sendIDAndConnID = std::make_pair(id, BROADCAST_0);
+        NFD_LOG_INFO("id: " << std::to_string(id) << " connID: " << std::to_string(BROADCAST_0));
         channel->createFace(&sendBufferQueue, &threadLock, sendIDAndConnID, req.params, onCreated, onFailure);
       }
 
