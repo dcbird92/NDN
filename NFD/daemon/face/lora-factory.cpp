@@ -219,7 +219,7 @@ LoRaFactory::sendPacket()
         NFD_LOG_ERROR("Passed a null queue item to send, not sending");
         return;
       }
-      // sendBufferQueue.pop();
+      sendBuffer = queueElement->second;
       // int bufSize = sendBuffer->size();
       // if (bufSize <= 0)
       // {
