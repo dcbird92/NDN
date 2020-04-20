@@ -175,30 +175,35 @@ void *LoRaFactory::transmit_and_recieve()
   NFD_LOG_INFO("Starting Lo-Ra thread");
   try
   {
-      while(true){
-
-        // Alternate between sending and receiving, so sending doesn't starve receive thread
-        // pthread_mutex_lock(&threadLock);
+    while(true){
+        pthread_mutex_lock(&threadLock);
         // Check and see if there is something to send
-        // if(sendBufferQueue.size() > 0) {
-        //   sendPacket();
-        //   NFD_LOG_INFO("sent!!!!!!!!");
-        // }
+        bool toSend = sendBufferQueue.size() > 0;
+        if (toSend) {
+          while(toSend) {
+            NFD_LOG_INFO("toSend is true");
+            sendBuffer = sendBufferQueue.front()->second;
+            sendBufferQueue.pop();
+            sendPacket();
+            toSend = sendBufferQueue.empty() == false;
+          }
 
-        // // After sending enter recieve mode again
-        // if (sx1272.receive() != 0) {
-        //   NFD_LOG_ERROR("unable to enter receive");
-        // }
-
-        // pthread_mutex_unlock(&threadLock);
-
-        // Check to see if the LoRa has received data... if so handle it (0ms wait for data, just checks once)
-        if (sx1272.checkForData()) {
-          NFD_LOG_ERROR("DATA!");
-          sx1272.getPacket();
-          // handleRead();
+          // After sending enter recieve mode again
+          sx1272.receive();
+          pthread_mutex_unlock(&threadLock);
         }
-      }
+        // Otherwise check and see if there is available data
+        else {
+
+            // No need to keep the lock here...
+            pthread_mutex_unlock(&threadLock);
+
+            // Check to see if the LoRa has received data... if so handle it
+            if (sx1272.checkForData()) {
+              handleRead();
+            }
+        }
+    }
   }
   catch(const std::exception& e)
   {
