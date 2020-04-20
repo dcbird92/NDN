@@ -181,9 +181,9 @@ void *LoRaFactory::transmit_and_recieve()
         bool toSend = sendBufferQueue.size() > 0;
         if (toSend) {
           while(toSend) {
-            NFD_LOG_INFO("toSend is true");
-            sendBuffer = sendBufferQueue.front()->second;
-            sendBufferQueue.pop();
+            // NFD_LOG_INFO("toSend is true");
+            // sendBuffer = sendBufferQueue.front()->second;
+            // sendBufferQueue.pop();
             sendPacket();
             toSend = sendBufferQueue.empty() == false;
           }
@@ -216,38 +216,38 @@ LoRaFactory::sendPacket()
 {
   try
   {
-      std::pair<std::pair<uint8_t, uint8_t>*, ndn::encoding::EncodingBuffer *>* queueElement = sendBufferQueue.front(); 
-      sendBufferQueue.pop();
-      int bufSize = sendBuffer->size();
-      if (bufSize <= 0)
-      {
-        NFD_LOG_ERROR("Trying to send a packet with no size");
-        return;
-      }
+      // std::pair<std::pair<uint8_t, uint8_t>*, ndn::encoding::EncodingBuffer *>* queueElement = sendBufferQueue.front(); 
+      // sendBufferQueue.pop();
+      // int bufSize = sendBuffer->size();
+      // if (bufSize <= 0)
+      // {
+      //   NFD_LOG_ERROR("Trying to send a packet with no size");
+      //   return;
+      // }
 
-      NFD_LOG_INFO("Packet size to be sent: " << bufSize);
+      // NFD_LOG_INFO("Packet size to be sent: " << bufSize);
 
       // copy the buffer into a cstr so we can send it
-      char * cstr = new char[bufSize];
-      int i = 0;
-      for (auto ptr : *sendBuffer)
-      {
-        cstr[i++] = ptr;
-        if(ptr == '\0')
-        {
-          // NFD_LOG_ERROR("Found null in send packet at idx: " << i);
-        }
-      }
+      // char * cstr = new char[bufSize];
+      // int i = 0;
+      // for (auto ptr : *sendBuffer)
+      // {
+      //   cstr[i++] = ptr;
+      //   if(ptr == '\0')
+      //   {
+      //     // NFD_LOG_ERROR("Found null in send packet at idx: " << i);
+      //   }
+      // }
 
-      if (i != bufSize)
-        NFD_LOG_ERROR("Sizes different. i: " << i << " bufSize: " << bufSize);
+      // if (i != bufSize)
+      //   NFD_LOG_ERROR("Sizes different. i: " << i << " bufSize: " << bufSize);
 
-      auto sentStuff = std::string();
-      for(int idx = 0; idx < bufSize; idx++)
-      {
-        sentStuff += std::to_string((int)cstr[idx]) + ", ";
-      }
-      NFD_LOG_INFO("Message that is to be sent: " << sentStuff);
+      // auto sentStuff = std::string();
+      // for(int idx = 0; idx < bufSize; idx++)
+      // {
+      //   sentStuff += std::to_string((int)cstr[idx]) + ", ";
+      // }
+      // NFD_LOG_INFO("Message that is to be sent: " << sentStuff);
 
       // std::pair<uint8_t, uint8_t>* ids = queueElement->first;
       // NFD_LOG_INFO("grabbed ids");
@@ -256,9 +256,11 @@ LoRaFactory::sendPacket()
       // uint8_t dst = ids->second;
       // NFD_LOG_INFO("dst" << std::to_string(dst));
       // Set LoRa source, send to dst
-      if ((e = sx1272.setNodeAddress(1)) != 0) {
-        NFD_LOG_ERROR("unable to set src ID " << std::to_string(1));
-      }
+      // if ((e = sx1272.setNodeAddress(1)) != 0) {
+      //   NFD_LOG_ERROR("unable to set src ID " << std::to_string(1));
+      // }
+      char* cstr = "Hello!\n";
+      int bufSize = 7;
       if ((e = sx1272.sendPacketTimeout(BROADCAST_0, cstr, bufSize)) != 0)
       {
         NFD_LOG_ERROR("Send operation failed: " + std::to_string(e));
@@ -269,13 +271,11 @@ LoRaFactory::sendPacket()
         // print block size because we don't want to count the padding in buffer
         NFD_LOG_INFO("Supposedly sent: " << bufSize << " bytes");
         NFD_LOG_INFO("LoRa actually sent: " << sx1272._payloadlength << " _payloadlength bytes");
-        NFD_LOG_INFO("src ");
-
       }
 
       // Have to free all of this stuff
-      delete[] cstr;
-      delete sendBuffer; 
+      // delete[] cstr;
+      // delete sendBuffer; 
   }
   catch(const std::exception& e)
   {
