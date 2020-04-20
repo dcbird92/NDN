@@ -10,7 +10,7 @@ namespace face {
 NFD_LOG_INIT(LoRaTransport);
 
 LoRaTransport::LoRaTransport(std::pair<uint8_t, uint8_t>* ids,
-                            std::queue<std::pair<std::pair<uint8_t, uint8_t>*, ndn::encoding::EncodingBuffer *>>& packetQueue, 
+                            std::queue<std::pair<std::pair<uint8_t, uint8_t>*, ndn::encoding::EncodingBuffer *>*>& packetQueue, 
                             pthread_mutex_t& queueMutex) {
 
     // Set all of the static variables associated with this transmission (just need to set MTU)
@@ -52,6 +52,7 @@ LoRaTransport::LoRaTransport(std::pair<uint8_t, uint8_t>* ids,
     // Save the queue and mutex so we can add messages, so ultimately the lora module can send them
     sendBufferQueue = packetQueue;
     threadLock = queueMutex;
+    idAndSendAddr = ids;
 }
 
 void LoRaTransport::doClose() {
@@ -65,7 +66,8 @@ void LoRaTransport::doSend(const ndn::Block &packet, const EndpointId& endpoint)
   // Set the flag high that we have a packet to transmit, and push the new data onto the queue
   // std::make_pair(std::make_pair(-1L,-1L),std::make_pair(0L,0L))
   pthread_mutex_lock(&threadLock);
-  sendBufferQueue.push(new ndn::EncodingBuffer(packet));
+  std::pair pairToPush = std::make_pair(idAndSendAddr, new ndn::EncodingBuffer(packet));
+  sendBufferQueue.push(&pairToPush);
   NFD_LOG_FACE_TRACE("Send item added to queue");
   pthread_mutex_unlock(&threadLock);
 }

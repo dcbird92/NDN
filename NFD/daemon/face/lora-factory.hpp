@@ -109,7 +109,7 @@ private:
   pthread_mutex_t threadLock = PTHREAD_MUTEX_INITIALIZER; 
 
   // Queue used to send messages out through LoRa
-  std::queue<std::pair<std::pair<uint8_t, uint8_t>*, ndn::encoding::EncodingBuffer *>> sendBufferQueue;
+  std::queue<std::pair<std::pair<uint8_t, uint8_t>*, ndn::encoding::EncodingBuffer *>*> sendBufferQueue;
   ndn::encoding::EncodingBuffer *sendBuffer;
 
 };

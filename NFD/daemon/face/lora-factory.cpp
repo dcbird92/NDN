@@ -70,15 +70,20 @@ LoRaFactory::doCreateFace(const CreateFaceRequest& req,
 
       // Otherwise create a channel for this new request and a face associated with it (either unicast or multicast)
       // If the URI contains a '-', we know its a unicast face
-      if (URI.find('-') != std::string::npos) {
+      size_t hyphenPosition = URI.find('-');
+      if (hyphenPosition != std::string::npos) {
         auto channel = createChannel(URI);
-        std::pair<uint8_t, uint8_t> sendIDAndConnID = std::make_pair()
-        channel->createFace(sendBufferQueue, threadLock, req.params, onCreated, onFailure);
+        uint8_t id = std::stoi(URI.substr(7, hyphenPosition - 7));
+        uint8_t connID = std::stoi(URI.substr(hyphenPosition+1));
+        std::pair<uint8_t, uint8_t> sendIDAndConnID = std::make_pair(id, connID);
+        channel->createFace(sendBufferQueue, threadLock, &sendIDAndConnID, req.params, onCreated, onFailure);
       }
       // Otherwise its a multicast face (broadcast)
       else {
         auto channel = createMultiCastChannel(URI);
-        channel->createFace(sendBufferQueue, threadLock, req.params, onCreated, onFailure);
+        uint8_t id = std::stoi(URI.substr(7));
+        std::pair<uint8_t, uint8_t> sendIDAndConnID = std::make_pair(id, BROADCAST_0);
+        channel->createFace(sendBufferQueue, threadLock, &sendIDAndConnID, req.params, onCreated, onFailure);
       }
 
   }
