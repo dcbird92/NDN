@@ -264,7 +264,7 @@ LoRaFactory::sendPacket()
       // if ((e = sx1272.setNodeAddress(1)) != 0) {
       //   NFD_LOG_ERROR("unable to set src ID " << std::to_string(1));
       // }
-      char* cstr = "Hello!\n";
+      cstr = "Hello!\n";
       bufSize = 7;
       if ((e = sx1272.sendPacketTimeout(BROADCAST_0, cstr, bufSize)) != 0)
       {
