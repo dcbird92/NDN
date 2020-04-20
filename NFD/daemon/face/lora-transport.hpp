@@ -16,9 +16,6 @@
 #include <fstream>
 #include <unordered_set>
 
-// Include the SX1272 and SPI library:
-#include "../../lora_libs/libraries/arduPiLoRa/arduPiLoRa.h"
-
 namespace nfd
 {
 namespace face

@@ -3,7 +3,7 @@
 
 #include "protocol-factory.hpp"
 #include "lora-channel.hpp"
-
+#include "../../lora_libs/libraries/arduPiLoRa/arduPiLoRa.h"
 
 namespace nfd {
 namespace face {

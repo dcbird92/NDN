@@ -3,7 +3,6 @@
 #include "lora-factory.hpp"
 #include "generic-link-service.hpp"
 #include "common/global.hpp"
-#include "../../lora_libs/libraries/arduPiLoRa/arduPiLoRa.h"
 
 namespace nfd {
 namespace face {
@@ -128,10 +127,10 @@ LoRaFactory::doGetChannels() const
 void
 LoRaFactory::setup(){
 
+    // Print a start message
+  int e;
   // Power ON the module
   e = sx1272.ON();
-  if (e)
-    NFD_LOG_INFO("Error configuring LoRa");
 
   // Set transmission mode
   //e = sx1272.setMode(4);
@@ -140,42 +139,31 @@ LoRaFactory::setup(){
   //Set Operating Parameters Coding Rate CR, Bandwidth BW, and Spreading Factor SF
   
   e = sx1272.setCR(CR_5);
-  if (e)
-    NFD_LOG_INFO("Error configuring LoRa");
   e = sx1272.setBW(BW_500);
-  if (e)
-    NFD_LOG_INFO("Error configuring LoRa");
   e = sx1272.setSF(SF_7);
-  if (e)
-    NFD_LOG_INFO("Error configuring LoRa");
+
+  // Set header
+  e = sx1272.setHeaderON();
+
+  // Select frequency channel
+  e = sx1272.setChannel(CH_00_900);
+
+  // Set CRC
+  e = sx1272.setCRC_ON();
+
+  // Select output power (Max, High or Low)
+  e = sx1272.setPower('H');
 
   // Set the node address
   e = sx1272.setNodeAddress(3);
-  
-  // Set header
-  e = sx1272.setHeaderON();
-  if (e)
-    NFD_LOG_INFO("Error configuring LoRa");
-  // Select frequency channel
-  e = sx1272.setChannel(CH_00_900);
-  if (e)
-    NFD_LOG_INFO("Error configuring LoRa");
-  // Set CRC
-  e = sx1272.setCRC_ON();
-  if (e)
-    NFD_LOG_INFO("Error configuring LoRa");
-  // Select output power (Max, High or Low)
-  e = sx1272.setPower('H');
-  if (e)
-    NFD_LOG_INFO("Error configuring LoRa");
 
   // Set the LoRa into receive mode by default
   e = sx1272.receive();
   if (e)
-    NFD_LOG_INFO("Error configuring LoRa");
+    NFD_LOG_INFO("Unable to enter receive mode");
 
   // Print a success message
-  NFD_LOG_INFO("SX1272 successfully configured");
+  NFD_LOG_INFO("SX1272 successfully configured\n\n");
   delay(1000);
 }
 
@@ -198,9 +186,9 @@ void *LoRaFactory::transmit_and_recieve()
         // }
 
         // // After sending enter recieve mode again
-        if (sx1272.receive() != 0) {
-          NFD_LOG_ERROR("unable to enter receive");
-        }
+        // if (sx1272.receive() != 0) {
+        //   NFD_LOG_ERROR("unable to enter receive");
+        // }
 
         // pthread_mutex_unlock(&threadLock);
 
