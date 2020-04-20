@@ -239,16 +239,12 @@ LoRaFactory::sendPacket()
       // NFD_LOG_INFO("Packet size to be sent: " << bufSize);
 
       // copy the buffer into a cstr so we can send it
-      // char * cstr = new char[bufSize];
-      // int i = 0;
-      // for (auto ptr : *sendBuffer)
-      // {
-      //   cstr[i++] = ptr;
-      //   if(ptr == '\0')
-      //   {
-      //     // NFD_LOG_ERROR("Found null in send packet at idx: " << i);
-      //   }
-      // }
+      char *cstr = new char[bufSize];
+      int i = 0;
+      for (auto ptr : *sendBuffer)
+      {
+        cstr[i++] = ptr;
+      }
 
       // if (i != bufSize)
       //   NFD_LOG_ERROR("Sizes different. i: " << i << " bufSize: " << bufSize);
