@@ -183,9 +183,7 @@ void *LoRaFactory::transmit_and_recieve()
     if (sx1272.receive() != 0) {
       NFD_LOG_ERROR("unable to enter receive");
     }
-    else {
-      NFD_LOG_ERROR("receiving!");
-    }
+    
     pthread_mutex_unlock(&threadLock);
 
     // Check to see if the LoRa has received data... if so handle it (0ms wait for data, just checks once)
@@ -240,7 +238,9 @@ LoRaFactory::sendPacket()
   uint8_t dst = ids->second;
   NFD_LOG_INFO("dst" << std::to_string(dst));
   // Set LoRa source, send to dst
-  sx1272.setNodeAddress(id);
+  if ((e = sx1272.setNodeAddress(id)) != 0) {
+    NFD_LOG_ERROR("unable to set src ID " << std::to_string(id));
+  }
   if ((e = sx1272.sendPacketTimeout(dst, cstr, bufSize)) != 0)
   {
     NFD_LOG_ERROR("Send operation failed: " + std::to_string(e));
