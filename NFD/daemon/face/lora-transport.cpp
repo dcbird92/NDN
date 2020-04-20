@@ -68,7 +68,7 @@ void LoRaTransport::doSend(const ndn::Block &packet, const EndpointId& endpoint)
   pthread_mutex_lock(&threadLock);
   ndn::encoding::EncodingBuffer *toSendBuff = new ndn::EncodingBuffer(packet);
   std::pair pairToPush = std::make_pair(idAndSendAddr, toSendBuff);
-  sendBufferQueue.push(&pairToPush);
+  sendBufferQueue->push(&pairToPush);
   NFD_LOG_FACE_TRACE("Send item added to queue");
   pthread_mutex_unlock(&threadLock);
 }
