@@ -127,10 +127,11 @@ LoRaFactory::doGetChannels() const
 
 void
 LoRaFactory::setup(){
-    // Print a start message
-  int e;
+
   // Power ON the module
   e = sx1272.ON();
+  if (e)
+    NFD_LOG_INFO("Error configuring LoRa");
 
   // Set transmission mode
   //e = sx1272.setMode(4);
@@ -139,25 +140,36 @@ LoRaFactory::setup(){
   //Set Operating Parameters Coding Rate CR, Bandwidth BW, and Spreading Factor SF
   
   e = sx1272.setCR(CR_5);
+  if (e)
+    NFD_LOG_INFO("Error configuring LoRa");
   e = sx1272.setBW(BW_500);
+  if (e)
+    NFD_LOG_INFO("Error configuring LoRa");
   e = sx1272.setSF(SF_7);
+  if (e)
+    NFD_LOG_INFO("Error configuring LoRa");
 
   // Set header
   e = sx1272.setHeaderON();
-
+  if (e)
+    NFD_LOG_INFO("Error configuring LoRa");
   // Select frequency channel
   e = sx1272.setChannel(CH_00_900);
-
+  if (e)
+    NFD_LOG_INFO("Error configuring LoRa");
   // Set CRC
   e = sx1272.setCRC_ON();
-
+  if (e)
+    NFD_LOG_INFO("Error configuring LoRa");
   // Select output power (Max, High or Low)
   e = sx1272.setPower('H');
+  if (e)
+    NFD_LOG_INFO("Error configuring LoRa");
 
   // Set the LoRa into receive mode by default
   e = sx1272.receive();
   if (e)
-    NFD_LOG_INFO("Unable to enter receive mode");
+    NFD_LOG_INFO("Error configuring LoRa");
 
   // Print a success message
   NFD_LOG_INFO("SX1272 successfully configured");
@@ -170,94 +182,109 @@ LoRaFactory::setup(){
 void *LoRaFactory::transmit_and_recieve()
 {
   NFD_LOG_INFO("Starting Lo-Ra thread");
-  while(true){
+  try
+  {
+      while(true){
 
-    // Alternate between sending and receiving, so sending doesn't starve receive thread
-    pthread_mutex_lock(&threadLock);
-    // Check and see if there is something to send
-    if(sendBufferQueue.size() > 0) {
-      sendPacket();
-    }
+        // Alternate between sending and receiving, so sending doesn't starve receive thread
+        pthread_mutex_lock(&threadLock);
+        // Check and see if there is something to send
+        if(sendBufferQueue.size() > 0) {
+          sendPacket();
+        }
 
-    // After sending enter recieve mode again
-    if (sx1272.receive() != 0) {
-      NFD_LOG_ERROR("unable to enter receive");
-    }
+        // After sending enter recieve mode again
+        if (sx1272.receive() != 0) {
+          NFD_LOG_ERROR("unable to enter receive");
+        }
 
-    pthread_mutex_unlock(&threadLock);
+        pthread_mutex_unlock(&threadLock);
 
-    // Check to see if the LoRa has received data... if so handle it (0ms wait for data, just checks once)
-    if (sx1272.checkForData()) {
-      NFD_LOG_ERROR("DATA!");
-      handleRead();
-    }
+        // Check to see if the LoRa has received data... if so handle it (0ms wait for data, just checks once)
+        if (sx1272.checkForData()) {
+          NFD_LOG_ERROR("DATA!");
+          handleRead();
+        }
+      }
+  }
+  catch(const std::exception& e)
+  {
+    NFD_LOG_ERROR(e.what());
   }
 }
 
 void
 LoRaFactory::sendPacket()
 {
-  std::pair<std::pair<uint8_t, uint8_t>*, ndn::encoding::EncodingBuffer *>* queueElement = sendBufferQueue.front(); 
-  sendBufferQueue.pop();
-  sendBuffer = queueElement->second;
-  int bufSize = sendBuffer->size();
-  if (bufSize <= 0)
+  try
   {
-    NFD_LOG_ERROR("Trying to send a packet with no size");
-    return;
+      std::pair<std::pair<uint8_t, uint8_t>*, ndn::encoding::EncodingBuffer *>* queueElement = sendBufferQueue.front(); 
+      sendBufferQueue.pop();
+      sendBuffer = queueElement->second;
+      int bufSize = sendBuffer->size();
+      if (bufSize <= 0)
+      {
+        NFD_LOG_ERROR("Trying to send a packet with no size");
+        return;
+      }
+
+      NFD_LOG_INFO("Packet size to be sent: " << bufSize);
+
+      // copy the buffer into a cstr so we can send it
+      char * cstr = new char[bufSize];
+      int i = 0;
+      for (auto ptr : *sendBuffer)
+      {
+        cstr[i++] = ptr;
+        if(ptr == '\0')
+        {
+          // NFD_LOG_ERROR("Found null in send packet at idx: " << i);
+        }
+      }
+
+      if (i != bufSize)
+        NFD_LOG_ERROR("Sizes different. i: " << i << " bufSize: " << bufSize);
+
+      auto sentStuff = std::string();
+      for(int idx = 0; idx < bufSize; idx++)
+      {
+        sentStuff += std::to_string((int)cstr[idx]) + ", ";
+      }
+      NFD_LOG_INFO("Message that is to be sent: " << sentStuff);
+
+      std::pair<uint8_t, uint8_t>* ids = queueElement->first;
+      NFD_LOG_INFO("grabbed ids");
+      uint8_t id = ids->first;
+      NFD_LOG_INFO("id" << std::to_string(id));
+      uint8_t dst = ids->second;
+      NFD_LOG_INFO("dst" << std::to_string(dst));
+      // Set LoRa source, send to dst
+      if ((e = sx1272.setNodeAddress(id)) != 0) {
+        NFD_LOG_ERROR("unable to set src ID " << std::to_string(id));
+      }
+      if ((e = sx1272.sendPacketTimeout(dst, cstr, bufSize)) != 0)
+      {
+        NFD_LOG_ERROR("Send operation failed: " + std::to_string(e));
+      }
+      else
+      {
+        NFD_LOG_INFO("sent to " << std::to_string(dst) << " from " << std::to_string(id));
+        // print block size because we don't want to count the padding in buffer
+        NFD_LOG_INFO("Supposedly sent: " << bufSize << " bytes");
+        NFD_LOG_INFO("LoRa actually sent: " << sx1272._payloadlength << " _payloadlength bytes");
+        NFD_LOG_INFO("src ");
+
+      }
+
+      // Have to free all of this stuff
+      delete[] cstr;
+      delete sendBuffer; 
   }
-
-  NFD_LOG_INFO("Packet size to be sent: " << bufSize);
-
-  // copy the buffer into a cstr so we can send it
-  char * cstr = new char[bufSize];
-  int i = 0;
-  for (auto ptr : *sendBuffer)
+  catch(const std::exception& e)
   {
-    cstr[i++] = ptr;
-    if(ptr == '\0')
-    {
-      // NFD_LOG_ERROR("Found null in send packet at idx: " << i);
-    }
+    NFD_LOG_ERROR(e.what());
   }
-
-  if (i != bufSize)
-    NFD_LOG_ERROR("Sizes different. i: " << i << " bufSize: " << bufSize);
-
-  auto sentStuff = std::string();
-  for(int idx = 0; idx < bufSize; idx++)
-  {
-    sentStuff += std::to_string((int)cstr[idx]) + ", ";
-  }
-  NFD_LOG_INFO("Message that is to be sent: " << sentStuff);
-
-  std::pair<uint8_t, uint8_t>* ids = queueElement->first;
-  NFD_LOG_INFO("grabbed ids");
-  uint8_t id = ids->first;
-  NFD_LOG_INFO("id" << std::to_string(id));
-  uint8_t dst = ids->second;
-  NFD_LOG_INFO("dst" << std::to_string(dst));
-  // Set LoRa source, send to dst
-  if ((e = sx1272.setNodeAddress(id)) != 0) {
-    NFD_LOG_ERROR("unable to set src ID " << std::to_string(id));
-  }
-  if ((e = sx1272.sendPacketTimeout(dst, cstr, bufSize)) != 0)
-  {
-    NFD_LOG_ERROR("Send operation failed: " + std::to_string(e));
-  }
-  else
-  {
-    NFD_LOG_INFO("sent to " << std::to_string(dst) << " from " << std::to_string(id));
-    // print block size because we don't want to count the padding in buffer
-    NFD_LOG_INFO("Supposedly sent: " << bufSize << " bytes");
-    NFD_LOG_INFO("LoRa actually sent: " << sx1272._payloadlength << " _payloadlength bytes");
-    NFD_LOG_INFO("src ");
-
-  }
-
-  // Have to free all of this stuff
-  delete[] cstr;
-  delete sendBuffer; 
+  
 }
 
 void

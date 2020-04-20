@@ -17,37 +17,37 @@ LoRaTransport::LoRaTransport(std::pair<uint8_t, uint8_t> ids,
     this->setMtu(160);
 
     // Read in a certain topology if flag is high (can add certain other LoRa IDs to send to and recv from)
-    if (readTopology) {
-        std::ifstream infile(topologyFilename); 
-        std::string token;
-        std::string value;
-        while (std::getline(infile, token))
-        {
-          // Grab the ID field
-          if (token.substr(0,2) == "id") {
-            int id = token[3] - '0';
-            int err = sx1272.setNodeAddress(id);  // Set the ID so src in packets can be set
-            if (err != 0) {
-              NFD_LOG_ERROR("Unable to set nodeAddress! Fatal, restart");
-            }
-          }
-          // Grab the send field
-          if (token.substr(0,4) == "send") {
-            std::istringstream istr (token.substr(5));
-            while(std::getline(istr, value, ',')) {
-              send.insert((uint8_t)(value[0] - '0'));
-            }
-          }
-          // Grab the recv field
-          if (token.substr(0,4) == "recv") {
-            std::istringstream istr (token.substr(5));
-            while(std::getline(istr, value, ',')) {
-              recv.insert((uint8_t)(value[0] - '0'));
-            }
-          }
-        }
-        NFD_LOG_INFO("Read in topology");
-    }
+    // if (readTopology) {
+    //     std::ifstream infile(topologyFilename); 
+    //     std::string token;
+    //     std::string value;
+    //     while (std::getline(infile, token))
+    //     {
+    //       // Grab the ID field
+    //       if (token.substr(0,2) == "id") {
+    //         int id = token[3] - '0';
+    //         int err = sx1272.setNodeAddress(id);  // Set the ID so src in packets can be set
+    //         if (err != 0) {
+    //           NFD_LOG_ERROR("Unable to set nodeAddress! Fatal, restart");
+    //         }
+    //       }
+    //       // Grab the send field
+    //       if (token.substr(0,4) == "send") {
+    //         std::istringstream istr (token.substr(5));
+    //         while(std::getline(istr, value, ',')) {
+    //           send.insert((uint8_t)(value[0] - '0'));
+    //         }
+    //       }
+    //       // Grab the recv field
+    //       if (token.substr(0,4) == "recv") {
+    //         std::istringstream istr (token.substr(5));
+    //         while(std::getline(istr, value, ',')) {
+    //           recv.insert((uint8_t)(value[0] - '0'));
+    //         }
+    //       }
+    //     }
+    //     NFD_LOG_INFO("Read in topology");
+    // }
 
     // Save the queue and mutex so we can add messages, so ultimately the lora module can send them
     sendBufferQueue = packetQueue;
@@ -64,15 +64,22 @@ void LoRaTransport::doClose() {
 
 void LoRaTransport::doSend(const ndn::Block &packet, const EndpointId& endpoint) {
   // Set the flag high that we have a packet to transmit, and push the new data onto the queue
-  // std::make_pair(std::make_pair(-1L,-1L),std::make_pair(0L,0L))
-  pthread_mutex_lock(threadLock);
-  NFD_LOG_INFO("sending to: " << std::to_string(idAndSendAddr.second) << " from " << std::to_string(idAndSendAddr.first) << " TRANSPORT");
-  ndn::encoding::EncodingBuffer *toSendBuff = new ndn::EncodingBuffer(packet);
-  NFD_LOG_INFO("created packet");
-  std::pair<std::pair<uint8_t, uint8_t>*, ndn::encoding::EncodingBuffer *> pairToPush = std::make_pair(&idAndSendAddr, toSendBuff);
-  sendBufferQueue->push(&pairToPush);
-  NFD_LOG_INFO("Send item added to queue");
-  pthread_mutex_unlock(threadLock);
+  try
+  {
+      pthread_mutex_lock(threadLock);
+      NFD_LOG_INFO("sending to: " << std::to_string(idAndSendAddr.second) << " from " << std::to_string(idAndSendAddr.first) << " TRANSPORT");
+      ndn::encoding::EncodingBuffer *toSendBuff = new ndn::EncodingBuffer(packet);
+      NFD_LOG_INFO("created packet");
+      std::pair<std::pair<uint8_t, uint8_t>*, ndn::encoding::EncodingBuffer *> pairToPush = std::make_pair(&idAndSendAddr, toSendBuff);
+      sendBufferQueue->push(&pairToPush);
+      NFD_LOG_INFO("Send item added to queue");
+      pthread_mutex_unlock(threadLock);
+  }
+  catch(const std::exception& e)
+  {
+    NFD_LOG_ERROR(e.what());
+  }
+  
 }
 
 void
