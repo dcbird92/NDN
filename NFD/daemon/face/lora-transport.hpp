@@ -62,7 +62,7 @@ private:
     std::unordered_set<uint8_t> recv = std::unordered_set<uint8_t>();
 
     // Block to store stuff in
-    std::queue<std::pair<std::pair<uint8_t, uint8_t>*, ndn::encoding::EncodingBuffer *>> sendBufferQueue;
+    std::queue<std::pair<std::pair<uint8_t, uint8_t>*, ndn::encoding::EncodingBuffer *>*>* sendBufferQueue;
     pthread_mutex_t threadLock;
 
 public:
