@@ -256,12 +256,12 @@ LoRaFactory::sendPacket()
         NFD_LOG_ERROR("Passed a null pair of ids, not sending");
         return;
       }
+
+      uint8_t dst = ids->second;
+      uint8_t id = ids->first;
+      NFD_LOG_INFO("id" << std::to_string(id));
+      NFD_LOG_INFO("dst" << std::to_string(dst));
       
-      // NFD_LOG_INFO("grabbed ids");
-      // uint8_t id = ids->first;
-      // NFD_LOG_INFO("id" << std::to_string(id));
-      // uint8_t dst = ids->second;
-      // NFD_LOG_INFO("dst" << std::to_string(dst));
       // Set LoRa source, send to dst
       // if ((e = sx1272.setNodeAddress(1)) != 0) {
       //   NFD_LOG_ERROR("unable to set src ID " << std::to_string(1));
