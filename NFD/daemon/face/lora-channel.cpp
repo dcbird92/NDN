@@ -50,7 +50,7 @@ LoRaChannel::createFace(std::queue<std::pair<std::pair<uint8_t, uint8_t>*, ndn::
 {
   try
   {
-    NFD_LOG_CHAN_INFO"Creating face");
+    NFD_LOG_CHAN_INFO("Creating face");
     std::shared_ptr<Face> face;
     // Create the link service (we want to include fragmentation)
     GenericLinkService::Options options;
@@ -79,7 +79,7 @@ LoRaChannel::createFace(std::queue<std::pair<std::pair<uint8_t, uint8_t>*, ndn::
 
 void
 LoRaChannel::handleReceive(ndn::Block data){
-  NFD_LOG_CHAN_INFO"Calling receive");
+  NFD_LOG_CHAN_INFO("Calling receive");
   auto it = m_channelFaces.find("default");   // Change this if there multiple faces to a channel for lora
   static_cast<LoRaTransport*>(it->second->getTransport())->receiveData(data);
 }
