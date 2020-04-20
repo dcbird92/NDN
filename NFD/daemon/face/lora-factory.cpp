@@ -180,7 +180,12 @@ void *LoRaFactory::transmit_and_recieve()
     }
 
     // After sending enter recieve mode again
-    sx1272.receive();
+    if (sx1272.receive() != 0) {
+      NFD_LOG_ERROR("unable to enter receive");
+    }
+    else {
+      NFD_LOG_ERROR("receiving!");
+    }
     pthread_mutex_unlock(&threadLock);
 
     // Check to see if the LoRa has received data... if so handle it (0ms wait for data, just checks once)
