@@ -72,7 +72,7 @@ LoRaFactory::doCreateFace(const CreateFaceRequest& req,
       size_t hyphenPosition = URI.find('-');
       if (hyphenPosition != std::string::npos) {
         auto channel = createChannel(URI);
-        uint8_t id = std::stoi(URI.substr(7, hyphenPosition - 7));
+        uint8_t id = std::stoi(URI.substr(numberOfCharsInScheme, hyphenPosition - numberOfCharsInScheme));
         uint8_t connID = std::stoi(URI.substr(hyphenPosition+1));
         std::pair<uint8_t, uint8_t> sendIDAndConnID = std::make_pair(id, connID);
         NFD_LOG_INFO("id: " << std::to_string(id) << " connID: " << std::to_string(connID));
@@ -81,7 +81,7 @@ LoRaFactory::doCreateFace(const CreateFaceRequest& req,
       // Otherwise its a multicast face (broadcast)
       else {
         auto channel = createMultiCastChannel(URI);
-        uint8_t id = std::stoi(URI.substr(7));
+        uint8_t id = std::stoi(URI.substr(numberOfCharsInScheme));
         std::pair<uint8_t, uint8_t> sendIDAndConnID = std::make_pair(id, BROADCAST_0);
         NFD_LOG_INFO("id: " << std::to_string(id) << " connID: " << std::to_string(BROADCAST_0));
         channel->createFace(&sendBufferQueue, &threadLock, sendIDAndConnID, req.params, onCreated, onFailure);
@@ -126,18 +126,10 @@ LoRaFactory::doGetChannels() const
 
 void
 LoRaFactory::setup(){
-
-    // Print a start message
-  int e;
   // Power ON the module
   e = sx1272.ON();
-
-  // Set transmission mode
-  //e = sx1272.setMode(4);
-  
   
   //Set Operating Parameters Coding Rate CR, Bandwidth BW, and Spreading Factor SF
-  
   e = sx1272.setCR(CR_5);
   e = sx1272.setBW(BW_500);
   e = sx1272.setSF(SF_7);
@@ -163,7 +155,7 @@ LoRaFactory::setup(){
     NFD_LOG_INFO("Unable to enter receive mode");
 
   // Print a success message
-  NFD_LOG_INFO("SX1272 successfully configured\n\n");
+  NFD_LOG_INFO("SX1272 successfully configured");
   delay(1000);
 }
 
@@ -176,7 +168,9 @@ void *LoRaFactory::transmit_and_recieve()
   try
   {
     while(true){
+        // sendBufferQueue shared resouce
         pthread_mutex_lock(&threadLock);
+
         // Check and see if there is something to send
         bool toSend = sendBufferQueue.size() > 0;
         if (toSend) {
@@ -242,14 +236,6 @@ LoRaFactory::sendPacket()
         cstr[i++] = ptr;
       }
 
-      // Used for debugging
-      auto sentStuff = std::string();
-      for (int idx = 0; idx < bufSize; idx++)
-      {
-        sentStuff += std::to_string((int)cstr[idx]) + ", ";
-      }
-      NFD_LOG_DEBUG("Message that is to be sent: " << sentStuff);
-
       // Now grab src and dst IDs from queue item
       std::pair<uint8_t, uint8_t>* ids = queueElement->first;
       if (ids == nullptr) {
@@ -260,25 +246,31 @@ LoRaFactory::sendPacket()
       // Grad source and dst IDs
       uint8_t dst = ids->second;
       uint8_t id = ids->first;
-      NFD_LOG_INFO("id: " << std::to_string(id));
-      NFD_LOG_INFO("dst: " << std::to_string(dst));
       
       // Set LoRa source to ID
       if ((e = sx1272.setNodeAddress(id)) != 0) {
-        NFD_LOG_ERROR("unable to set src ID " << std::to_string(id));
+        NFD_LOG_ERROR("Unable to set src ID to " << std::to_string(id));
       }
 
       if ((e = sx1272.sendPacketTimeout(dst, cstr, bufSize)) != 0)
       {
         NFD_LOG_ERROR("Send operation failed: " + std::to_string(e));
       }
+      // Success!
       else
       {
-        NFD_LOG_INFO("Supposedly sent: " << bufSize << " bytes");
-        NFD_LOG_INFO("LoRa actually sent: " << sx1272._payloadlength << " _payloadlength bytes");
+        std::string info = "Successfully sent packet to ";
+        if (dst == BROADCAST_0) {
+          info += "everyone";
+        }
+        else
+        {
+          info += " ID: " + std::to_string(dst);
+        }  
+        NFD_LOG_INFO(info);
       }
 
-      // Have to free all of this stuff
+      // Have to free all of queue data
       delete[] cstr;
       delete sendBuffer; 
       delete ids;
