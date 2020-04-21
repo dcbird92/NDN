@@ -28,7 +28,6 @@ LoRaFactory::LoRaFactory(const CtorParams& params)
   // Create the neccessary thread to begin receving and transmitting
   pthread_t receive;
   int rc;
-
   rc = pthread_create(&receive, NULL, &LoRaFactory::transmit_and_receive_helper, this);
   if(rc) {
     NFD_LOG_ERROR("Unable to create initial thread to create receive and transmitting thread: " + std::to_string(rc));
