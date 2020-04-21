@@ -79,7 +79,6 @@ LoRaChannel::createFace(std::queue<std::pair<std::pair<uint8_t, uint8_t>*, ndn::
 
 void
 LoRaChannel::handleReceive(ndn::Block data){
-  NFD_LOG_CHAN_INFO("Calling receive");
   auto it = m_channelFaces.find("default");   // Change this if there multiple faces to a channel for lora
   static_cast<LoRaTransport*>(it->second->getTransport())->receiveData(data);
 }
