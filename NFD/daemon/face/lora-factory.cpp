@@ -291,11 +291,9 @@ LoRaFactory::handleRead() {
 
   while (dataToConsume) {
     e = sx1272.getPacket();
+    // Received packet correctly
     if (e == 0) {
-
-      NFD_LOG_INFO("\n\nData available to receive");
       int packetLength = (int)sx1272.getCurrentPacketLength();
-
       for (i = 0; i < packetLength; i++)
       {
           my_packet[i] = (char)sx1272.packet_received.data[i];
@@ -305,8 +303,6 @@ LoRaFactory::handleRead() {
       my_packet[i] = '\0';
       packetCreated = true;
       packetLength = i;
-      NFD_LOG_INFO("Received packet:" << my_packet);
-      NFD_LOG_INFO("With length:" << packetLength);
     }
     else {
       NFD_LOG_ERROR("Unable to get packet data: " + std::to_string(e));
@@ -320,15 +316,6 @@ LoRaFactory::handleRead() {
     return;
   }
 
-  NFD_LOG_INFO("i: " + std::to_string(i));
-  NFD_LOG_INFO("Full packet:" << my_packet);
-  auto gotStuff = std::string();
-  for(int idx = 0; idx < i; idx++)
-  {
-    gotStuff += std::to_string((int)my_packet[idx]);
-  }
-  NFD_LOG_INFO("Packet ascii:" << gotStuff);
-
   try
   {
     ndn::Block element = ndn::Block((uint8_t*)my_packet, i);
@@ -337,10 +324,8 @@ LoRaFactory::handleRead() {
       std::size_t position = i.first.find('-');
       // Check to see if the connection ID matches src, if it does pass the data to this face. Also if ID matches
       // lora://<id>-<connID>
-      std::string idString = i.first.substr(7, position - 7);
+      std::string idString = i.first.substr(numberOfCharsInScheme, position - numberOfCharsInScheme);
       std::string connIDString = i.first.substr(position+1);
-      NFD_LOG_ERROR("id " << idString);
-      NFD_LOG_ERROR("connID " << connIDString);
       if (std::stoi(connIDString) == sx1272.packet_received.src && (std::stoi(idString) == sx1272.packet_received.dst || sx1272.packet_received.dst == BROADCAST_0)) {
         i.second->handleReceive(element);
       }
@@ -348,7 +333,7 @@ LoRaFactory::handleRead() {
     // Pass to all broadcast channels with the right source
     // lora://<id>
     for (const auto& i : mcast_channels) {
-      std::string idString = i.first.substr(7);
+      std::string idString = i.first.substr(numberOfCharsInScheme);
       if (std::stoi(idString) == sx1272.packet_received.dst || sx1272.packet_received.dst == BROADCAST_0) {
         i.second->handleReceive(element);
       }
