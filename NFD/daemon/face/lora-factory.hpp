@@ -88,8 +88,8 @@ private:
 
 private:
   // scheme is lora://
-  int static final numberOfCharsInScheme = 7;
-  
+  const int numberOfCharsInScheme = 7;
+
   // Map for storing all the unicast channels
   std::map<std::string, std::shared_ptr<LoRaChannel>> m_channels;
 
