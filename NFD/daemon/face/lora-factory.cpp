@@ -279,8 +279,9 @@ LoRaFactory::sendPacket()
       }
 
       // Have to free all of this stuff
-      // delete[] cstr;
-      // delete sendBuffer; 
+      delete[] cstr;
+      delete sendBuffer; 
+      delete ids;
   }
   catch(const std::exception& e)
   {
