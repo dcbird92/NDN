@@ -84,6 +84,7 @@ void LoRaTransport::doSend(const ndn::Block &packet, const EndpointId& endpoint)
 
 void
 LoRaTransport::receiveData(ndn::Block data) {
+  NFD_LOG_FACE_INFO("Calling receive");
   this->receive(data);
 }
 
