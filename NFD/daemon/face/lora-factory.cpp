@@ -264,8 +264,8 @@ LoRaFactory::sendPacket()
       NFD_LOG_INFO("dst: " << std::to_string(dst));
       
       // Set LoRa source to ID
-      if ((e = sx1272.setNodeAddress(1)) != 0) {
-        NFD_LOG_ERROR("unable to set src ID " << std::to_string(1));
+      if ((e = sx1272.setNodeAddress(id)) != 0) {
+        NFD_LOG_ERROR("unable to set src ID " << std::to_string(id));
       }
 
       if ((e = sx1272.sendPacketTimeout(BROADCAST_0, cstr, bufSize)) != 0)
@@ -274,8 +274,6 @@ LoRaFactory::sendPacket()
       }
       else
       {
-        // NFD_LOG_INFO("sent to " << std::to_string(dst) << " from " << std::to_string(id));
-        // print block size because we don't want to count the padding in buffer
         NFD_LOG_INFO("Supposedly sent: " << bufSize << " bytes");
         NFD_LOG_INFO("LoRa actually sent: " << sx1272._payloadlength << " _payloadlength bytes");
       }
