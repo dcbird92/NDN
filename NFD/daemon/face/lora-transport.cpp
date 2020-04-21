@@ -64,16 +64,12 @@ void LoRaTransport::doSend(const ndn::Block &packet, const EndpointId& endpoint)
   try
   {
       pthread_mutex_lock(threadLock);
-      NFD_LOG_INFO("sending to: " << std::to_string(idAndSendAddr.second) << " from " << std::to_string(idAndSendAddr.first) << " TRANSPORT");
       ndn::encoding::EncodingBuffer *toSendBuff = new ndn::EncodingBuffer(packet);
-      NFD_LOG_INFO("created packet");
       std::pair<uint8_t, uint8_t> *ids = new std::pair<uint8_t, uint8_t>(idAndSendAddr.first, idAndSendAddr.second);
-      NFD_LOG_INFO("created ids");
       std::pair<std::pair<uint8_t, uint8_t>*, ndn::encoding::EncodingBuffer *>* pairToPush = new std::pair<std::pair<uint8_t, uint8_t>*, ndn::encoding::EncodingBuffer *>(ids, toSendBuff);
-      NFD_LOG_INFO("created pairToPush");
       sendBufferQueue->push(pairToPush);
-      NFD_LOG_INFO("Send item added to queue");
       pthread_mutex_unlock(threadLock);
+      NFD_LOG_FACE_INFO("Sending data");
   }
   catch(const std::exception& e)
   {
@@ -84,7 +80,7 @@ void LoRaTransport::doSend(const ndn::Block &packet, const EndpointId& endpoint)
 
 void
 LoRaTransport::receiveData(ndn::Block data) {
-  NFD_LOG_FACE_INFO("Calling receive");
+  NFD_LOG_FACE_INFO("Calling receive transport");
   this->receive(data);
 }
 
